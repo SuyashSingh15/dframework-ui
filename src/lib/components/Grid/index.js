@@ -503,10 +503,10 @@ const GridBase = memo(({
                 filterModel={filterModel}
                 getRowId={getGridRowId}
                 slots={{
-                    headerFilterMenu: false,
+                    // headerFilterMenu: false,
                     // toolbar: CustomToolbar,
                     // toolbar: null,
-                    footer: Footer
+                    // footer: Footer
                 }}
                 slotProps={{
                     footer: {
