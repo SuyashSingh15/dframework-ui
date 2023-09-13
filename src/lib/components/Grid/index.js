@@ -504,7 +504,8 @@ const GridBase = memo(({
                 getRowId={getGridRowId}
                 slots={{
                     headerFilterMenu: false,
-                    toolbar: CustomToolbar,
+                    // toolbar: CustomToolbar,
+                    // toolbar: null,
                     footer: Footer
                 }}
                 slotProps={{
