@@ -5,14 +5,14 @@ import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
 import { InputLabel } from "@mui/material";
-import { DesktopTimePicker } from "@mui/x-date-pickers/DesktopTimePicker";
+// import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs from "dayjs";
 
-const Field = ({ column, field, fieldLabel, formik, otherProps, classes }) => {
+const Field = ({ column, field, fieldLabel, formik, otherProps, classes, onChange }) => {
   const [timePeriod, setTimePeriod] = useState("AM");
   const [time, setTime] = useState(null);
 
@@ -44,7 +44,8 @@ const Field = ({ column, field, fieldLabel, formik, otherProps, classes }) => {
       formik.setFieldValue(field, dateTime.toISOString());
     }
   };
-
+  // console.log(dayjs().set('hour', 5).startOf('hour'), 
+  // column.dependentField && column.dependentField.operator === ">=" && formik.values[column.dependentField.field] !== "" ? dayjs(formik.values[column.dependentField.field]) : null)
   if (column.modifiedLabel) {
     return (
       <div
@@ -60,9 +61,13 @@ const Field = ({ column, field, fieldLabel, formik, otherProps, classes }) => {
           >
             {column.label}
           </InputLabel>
-          <DesktopTimePicker
+          <TimePicker
             variant="standard"
             value={time}
+            // value={formik.values[field]}
+            // onChange={(e) => onChange({ target: { name: field, value: e } })}
+            // minTime={dayjs().set('hour', 5).startOf('hour')}
+            minTime={column.dependentField && column.dependentField.operator === ">=" && formik.values[column.dependentField.field] !== "" ? dayjs(formik.values[column.dependentField.field]) : null}
             onChange={handleTimeChange}
             sx={{
               backgroundColor: "#4F5883 !important",
@@ -71,17 +76,20 @@ const Field = ({ column, field, fieldLabel, formik, otherProps, classes }) => {
               },
               width: "200px",
             }}
-            components={{
-              OpenPickerIcon: KeyboardArrowDownIcon,
-            }}
-            renderInput={(params) => (
-              <TextField {...params} placeholder="select" />
-            )}
+            format="hh:mm"
+            // label="hh:mm"
+            views={["hours", "minutes"]}
+          // components={{
+          //   OpenPickerIcon: KeyboardArrowDownIcon,
+          // }}
+          // renderInput={(params) => (
+          //   <TextField {...params} placeholder="select" />
+          // )}
 
-            // slots={{
-            //   textField: (params) => <TextField {...params} placeholder={column?.placeholder ? column?.placeholder : "hh:mm"} />,
-            //   openPickerIcon: KeyboardArrowDownIcon
-            // }}
+          // slots={{
+          //   textField: (params) => <TextField {...params} placeholder={column?.placeholder ? column?.placeholder : "hh:mm"} />,
+          //   openPickerIcon: KeyboardArrowDownIcon
+          // }}
           />
           <FormControl component="fieldset">
             <RadioGroup

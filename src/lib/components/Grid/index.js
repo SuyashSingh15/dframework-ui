@@ -284,7 +284,7 @@ const GridBase = memo(({
             if (
                 !model.noOptionButton &&
                 ((model.canDelete === undefined || model.canDelete) ||
-                (model.canEdit === undefined || model.canEdit))
+                    (model.canEdit === undefined || model.canEdit))
             ) {
                 finalColumns.push({
                     field: 'actions',
