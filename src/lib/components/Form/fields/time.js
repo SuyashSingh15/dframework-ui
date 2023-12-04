@@ -64,6 +64,7 @@ const Field = ({ column, field, fieldLabel, formik, otherProps, classes, onChang
           <TimePicker
             variant="standard"
             value={time}
+            disabled={column.dependentField && formik.values[column.dependentField.field] === ""}
             // value={formik.values[field]}
             // onChange={(e) => onChange({ target: { name: field, value: e } })}
             // minTime={dayjs().set('hour', 5).startOf('hour')}

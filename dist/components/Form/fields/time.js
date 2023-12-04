@@ -89,7 +89,8 @@ const Field = _ref => {
       }
     }, column.label), /*#__PURE__*/_react.default.createElement(_TimePicker.TimePicker, {
       variant: "standard",
-      value: time
+      value: time,
+      disabled: column.dependentField && formik.values[column.dependentField.field] === ""
       // value={formik.values[field]}
       // onChange={(e) => onChange({ target: { name: field, value: e } })}
       // minTime={dayjs().set('hour', 5).startOf('hour')}
