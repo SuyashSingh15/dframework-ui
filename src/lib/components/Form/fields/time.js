@@ -43,7 +43,7 @@ const Field = ({ column, field, fieldLabel, formik, otherProps, classes, onChang
       formik.setFieldValue(field, dateTime.toISOString());
     }
   };
-  console.log(column?.dependentField, column?.dependentField?.operator === ">=", formik.values);
+  console.log('plugin', column.dependentField, column?.dependentField?.operator === ">=", formik.values[column?.dependentField?.field]);
   if (column.modifiedLabel) {
     return (
       <div
@@ -62,9 +62,9 @@ const Field = ({ column, field, fieldLabel, formik, otherProps, classes, onChang
           <TimePicker
             variant="standard"
             value={time}
-            // disabled={column.dependentField && formik.values[column.dependentField.field] === ""}
+            disabled={column.dependentField && formik.values[column.dependentField.field] === ""}
             // minTime={dayjs().set('hour', 5).startOf('hour')}
-            minTime={column.dependentField && column.dependentField.operator === ">=" && formik.values[column.dependentField.field] !== "" ? dayjs(formik.values[column.dependentField.field]) : null}
+            minTime={column?.dependentField?.operator === ">=" && formik.values[column.dependentField.field] !== "" ? dayjs(formik.values[column.dependentField.field]) : null}
             onChange={handleTimeChange}
             sx={{
               backgroundColor: "#4F5883 !important",

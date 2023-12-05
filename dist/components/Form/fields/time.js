@@ -31,7 +31,7 @@ function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key i
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return typeof key === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (typeof input !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (typeof res !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); } // import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 const Field = _ref => {
-  var _column$dependentFiel;
+  var _column$dependentFiel, _column$dependentFiel2;
   let {
     column,
     field,
@@ -68,8 +68,9 @@ const Field = _ref => {
       formik.setFieldValue(field, dateTime.toISOString());
     }
   };
-  console.log(column === null || column === void 0 ? void 0 : column.dependentField, (column === null || column === void 0 || (_column$dependentFiel = column.dependentField) === null || _column$dependentFiel === void 0 ? void 0 : _column$dependentFiel.operator) === ">=", formik.values);
+  console.log('plugin', column.dependentField, (column === null || column === void 0 || (_column$dependentFiel = column.dependentField) === null || _column$dependentFiel === void 0 ? void 0 : _column$dependentFiel.operator) === ">=", formik.values[column === null || column === void 0 || (_column$dependentFiel2 = column.dependentField) === null || _column$dependentFiel2 === void 0 ? void 0 : _column$dependentFiel2.field]);
   if (column.modifiedLabel) {
+    var _column$dependentFiel3;
     return /*#__PURE__*/_react.default.createElement("div", {
       style: {
         display: "flex",
@@ -88,11 +89,11 @@ const Field = _ref => {
       }
     }, column.label), /*#__PURE__*/_react.default.createElement(_TimePicker.TimePicker, {
       variant: "standard",
-      value: time
-      // disabled={column.dependentField && formik.values[column.dependentField.field] === ""}
+      value: time,
+      disabled: column.dependentField && formik.values[column.dependentField.field] === ""
       // minTime={dayjs().set('hour', 5).startOf('hour')}
       ,
-      minTime: column.dependentField && column.dependentField.operator === ">=" && formik.values[column.dependentField.field] !== "" ? (0, _dayjs.default)(formik.values[column.dependentField.field]) : null,
+      minTime: (column === null || column === void 0 || (_column$dependentFiel3 = column.dependentField) === null || _column$dependentFiel3 === void 0 ? void 0 : _column$dependentFiel3.operator) === ">=" && formik.values[column.dependentField.field] !== "" ? (0, _dayjs.default)(formik.values[column.dependentField.field]) : null,
       onChange: handleTimeChange,
       sx: {
         backgroundColor: "#4F5883 !important",

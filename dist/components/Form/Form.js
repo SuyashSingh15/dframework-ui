@@ -222,7 +222,7 @@ const Form = _ref => {
     variant: 'outlined',
     color: 'primary'
   }, {
-    text: 'Add',
+    text: 'Save',
     variant: 'contained',
     color: 'success'
   }];
@@ -266,7 +266,7 @@ const Form = _ref => {
       ml: 2,
       mt: 4
     }, /*#__PURE__*/_react.default.createElement(model.CustomButton, {
-      buttonFunction: button.text === 'Add' ? () => {
+      buttonFunction: button.text === 'Save' ? () => {
         formik.handleSubmit();
         closeDialog();
       } : () => {

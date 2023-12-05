@@ -128,7 +128,7 @@ const Form = ({
     }
     const handleFormCancel = function (e) {
         e?.preventDefault();
-        if(model.path) {
+        if (model.path) {
             navigate(`./${model.path}`);
         } else {
             navigate('./');
@@ -168,7 +168,7 @@ const Form = ({
         gridData[name] = value;
         setData(gridData);
     }
-    const actionButtons = [{ text: 'Reset', variant: 'outlined', color: 'primary' }, { text: 'Add', variant: 'contained', color: 'success' }]
+    const actionButtons = [{ text: 'Reset', variant: 'outlined', color: 'primary' }, { text: 'Save', variant: 'contained', color: 'success' }]
     const content = (
         <>
             <form>
@@ -194,7 +194,7 @@ const Form = ({
                     {actionButtons.map((button, index) => {
                         return (
                             <Box key={index} ml={2} mt={4} >
-                                <model.CustomButton buttonFunction={button.text === 'Add' ? () => { formik.handleSubmit(); closeDialog() } : () => { handleDiscardChanges() }} buttonText={button.text} variant={button.variant} color={button.color} />
+                                <model.CustomButton buttonFunction={button.text === 'Save' ? () => { formik.handleSubmit(); closeDialog() } : () => { handleDiscardChanges() }} buttonText={button.text} variant={button.variant} color={button.color} />
                             </Box>
                         )
                     })}
