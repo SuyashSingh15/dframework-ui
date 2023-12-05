@@ -5,8 +5,7 @@ import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
 import { InputLabel } from "@mui/material";
-// import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+// import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -44,8 +43,7 @@ const Field = ({ column, field, fieldLabel, formik, otherProps, classes, onChang
       formik.setFieldValue(field, dateTime.toISOString());
     }
   };
-  // console.log(dayjs().set('hour', 5).startOf('hour'), 
-  // column.dependentField && column.dependentField.operator === ">=" && formik.values[column.dependentField.field] !== "" ? dayjs(formik.values[column.dependentField.field]) : null)
+  console.log(column?.dependentField, column?.dependentField?.operator === ">=", formik.values);
   if (column.modifiedLabel) {
     return (
       <div
@@ -65,8 +63,6 @@ const Field = ({ column, field, fieldLabel, formik, otherProps, classes, onChang
             variant="standard"
             value={time}
             // disabled={column.dependentField && formik.values[column.dependentField.field] === ""}
-            // value={formik.values[field]}
-            // onChange={(e) => onChange({ target: { name: field, value: e } })}
             // minTime={dayjs().set('hour', 5).startOf('hour')}
             minTime={column.dependentField && column.dependentField.operator === ">=" && formik.values[column.dependentField.field] !== "" ? dayjs(formik.values[column.dependentField.field]) : null}
             onChange={handleTimeChange}

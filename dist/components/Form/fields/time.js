@@ -17,7 +17,6 @@ var _RadioGroup = _interopRequireDefault(require("@mui/material/RadioGroup"));
 var _FormControlLabel = _interopRequireDefault(require("@mui/material/FormControlLabel"));
 var _FormControl = _interopRequireDefault(require("@mui/material/FormControl"));
 var _material = require("@mui/material");
-var _KeyboardArrowDown = _interopRequireDefault(require("@mui/icons-material/KeyboardArrowDown"));
 var _TimePicker = require("@mui/x-date-pickers/TimePicker");
 var _AdapterDayjs = require("@mui/x-date-pickers/AdapterDayjs");
 var _LocalizationProvider = require("@mui/x-date-pickers/LocalizationProvider");
@@ -30,8 +29,9 @@ function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbol
 function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return typeof key === "symbol" ? key : String(key); }
-function _toPrimitive(input, hint) { if (typeof input !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (typeof res !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); } // import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+function _toPrimitive(input, hint) { if (typeof input !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (typeof res !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); } // import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 const Field = _ref => {
+  var _column$dependentFiel;
   let {
     column,
     field,
@@ -68,8 +68,7 @@ const Field = _ref => {
       formik.setFieldValue(field, dateTime.toISOString());
     }
   };
-  // console.log(dayjs().set('hour', 5).startOf('hour'), 
-  // column.dependentField && column.dependentField.operator === ">=" && formik.values[column.dependentField.field] !== "" ? dayjs(formik.values[column.dependentField.field]) : null)
+  console.log(column === null || column === void 0 ? void 0 : column.dependentField, (column === null || column === void 0 || (_column$dependentFiel = column.dependentField) === null || _column$dependentFiel === void 0 ? void 0 : _column$dependentFiel.operator) === ">=", formik.values);
   if (column.modifiedLabel) {
     return /*#__PURE__*/_react.default.createElement("div", {
       style: {
@@ -91,8 +90,6 @@ const Field = _ref => {
       variant: "standard",
       value: time
       // disabled={column.dependentField && formik.values[column.dependentField.field] === ""}
-      // value={formik.values[field]}
-      // onChange={(e) => onChange({ target: { name: field, value: e } })}
       // minTime={dayjs().set('hour', 5).startOf('hour')}
       ,
       minTime: column.dependentField && column.dependentField.operator === ">=" && formik.values[column.dependentField.field] !== "" ? (0, _dayjs.default)(formik.values[column.dependentField.field]) : null,
