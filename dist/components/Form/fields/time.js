@@ -93,7 +93,7 @@ const Field = _ref => {
       disabled: column.dependentField && formik.values[column.dependentField.field] === ""
       // minTime={dayjs().set('hour', 5).startOf('hour')}
       ,
-      minTime: (column === null || column === void 0 || (_column$dependentFiel3 = column.dependentField) === null || _column$dependentFiel3 === void 0 ? void 0 : _column$dependentFiel3.operator) === ">=" && formik.values[column.dependentField.field] !== "" ? (0, _dayjs.default)(formik.values[column.dependentField.field]) : null,
+      minTime: (column === null || column === void 0 || (_column$dependentFiel3 = column.dependentField) === null || _column$dependentFiel3 === void 0 ? void 0 : _column$dependentFiel3.operator) === ">=" && formik.values[column.dependentField.field] !== "" ? (0, _dayjs.default)(formik.values[column.dependentField.field]).set("minute", 4) : null,
       onChange: handleTimeChange,
       sx: {
         backgroundColor: "#4F5883 !important",

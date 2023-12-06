@@ -64,7 +64,7 @@ const Field = ({ column, field, fieldLabel, formik, otherProps, classes, onChang
             value={time}
             disabled={column.dependentField && formik.values[column.dependentField.field] === ""}
             // minTime={dayjs().set('hour', 5).startOf('hour')}
-            minTime={column?.dependentField?.operator === ">=" && formik.values[column.dependentField.field] !== "" ? dayjs(formik.values[column.dependentField.field]) : null}
+            minTime={column?.dependentField?.operator === ">=" && formik.values[column.dependentField.field] !== "" ? dayjs(formik.values[column.dependentField.field]).set("minute", 4) : null}
             onChange={handleTimeChange}
             sx={{
               backgroundColor: "#4F5883 !important",
