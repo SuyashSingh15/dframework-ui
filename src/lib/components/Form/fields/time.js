@@ -14,12 +14,16 @@ import dayjs from "dayjs";
 const Field = ({ column, field, fieldLabel, formik, otherProps, classes, onChange }) => {
   const [timePeriod, setTimePeriod] = useState("AM");
   const [time, setTime] = useState(null);
+  // const [err, setErr] = useState(null);
 
   useEffect(() => {
     if (formik.values[field]) {
       const dateTime = dayjs(formik.values[field]);
       setTime(dateTime);
       setTimePeriod(dateTime.format("A"));
+    } else {
+      setTimePeriod("AM");
+      setTime(null);
     }
   }, [formik.values]);
 
@@ -29,6 +33,9 @@ const Field = ({ column, field, fieldLabel, formik, otherProps, classes, onChang
   };
 
   const handleTimeChange = (newTime) => {
+    // if (err) {
+    //   newTime = dayjs(formik.values[column.dependentField.field]).add(5, 'minute')
+    // }
     setTime(newTime);
     updateFormikTime(newTime, timePeriod);
   };
@@ -43,28 +50,37 @@ const Field = ({ column, field, fieldLabel, formik, otherProps, classes, onChang
       formik.setFieldValue(field, dateTime.toISOString());
     }
   };
-  console.log('plugin', column.dependentField, column?.dependentField?.operator === ">=", formik.values[column?.dependentField?.field]);
+  console.log('plugin', formik.values, formik.errors, formik.touched);
   if (column.modifiedLabel) {
     return (
       <div
         style={{ display: "flex", alignItems: "center", gap: '2.9rem', width: '337px !important' }}>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <InputLabel
-            sx={{
-              margin: "1.8rem 2rem 2.5rem 0rem",
-              position: "absolute",
-              zIndex: "1",
-              transform: "translate(14px, -9px) scale(0.75)",
-            }}
-          >
-            {column.label}
-          </InputLabel>
-          <TimePicker
-            variant="standard"
+
+          <TimePicker style={{ flex: 2 }}
+            // label={<InputLabel
+            //   sx={{
+            //     margin: "1.8rem 2rem 2.5rem 0rem",
+            //     position: "absolute",
+            //     zIndex: "1",
+            //     transform: "translate(10px, -9px) scale(0.75)",
+            //     // color: formik.touched[field] && formik.errors[field] ? "#f44336" : "inherit"
+            //   }}
+            // >
+            //   {column.label}
+            // </InputLabel>}
+            label={column.label}
             value={time}
             disabled={column.dependentField && formik.values[column.dependentField.field] === ""}
-            // minTime={dayjs().set('hour', 5).startOf('hour')}
-            minTime={column?.dependentField?.operator === ">=" && formik.values[column.dependentField.field] !== "" ? dayjs(formik.values[column.dependentField.field]).set("minute", 4) : null}
+            slotProps={{
+              textField: {
+                helperText: formik.touched[field] && formik.errors[field],
+                error: formik.touched[field] && formik.errors[field],
+                variant: "filled",
+                placeholder: "hh:mm"
+              },
+            }}
+            minTime={column?.dependentField?.operator === ">=" && formik.values[column.dependentField.field] !== "" ? dayjs(formik.values[column.dependentField.field]).add(5, 'minute') : null}
             onChange={handleTimeChange}
             sx={{
               backgroundColor: "#4F5883 !important",
@@ -74,21 +90,9 @@ const Field = ({ column, field, fieldLabel, formik, otherProps, classes, onChang
               width: "200px",
             }}
             format="hh:mm"
-            // label="hh:mm"
             views={["hours", "minutes"]}
-          // components={{
-          //   OpenPickerIcon: KeyboardArrowDownIcon,
-          // }}
-          // renderInput={(params) => (
-          //   <TextField {...params} placeholder="select" />
-          // )}
-
-          // slots={{
-          //   textField: (params) => <TextField {...params} placeholder={column?.placeholder ? column?.placeholder : "hh:mm"} />,
-          //   openPickerIcon: KeyboardArrowDownIcon
-          // }}
           />
-          <FormControl component="fieldset">
+          <FormControl component="fieldset" style={{ flex: 1 }}>
             <RadioGroup
               value={timePeriod}
               onChange={handleRadioChange}

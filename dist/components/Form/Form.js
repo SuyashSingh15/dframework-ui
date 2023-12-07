@@ -96,7 +96,7 @@ const Form = _ref => {
     enableReinitialize: true,
     initialValues: _objectSpread(_objectSpread({}, model.initialValues), data),
     validationSchema: validationSchema,
-    validateOnBlur: false,
+    validateOnBlur: true,
     onSubmit: (values, _ref2) => {
       let {
         resetForm
@@ -115,6 +115,7 @@ const Form = _ref => {
         setError: snackbar === null || snackbar === void 0 ? void 0 : snackbar.showError
       }).then(success => {
         if (success) {
+          closeDialog && closeDialog();
           snackbar === null || snackbar === void 0 || snackbar.showMessage('Record Updated Successfully.');
           // navigate('./');
         }
@@ -266,12 +267,10 @@ const Form = _ref => {
       ml: 2,
       mt: 4
     }, /*#__PURE__*/_react.default.createElement(model.CustomButton, {
-      buttonFunction: button.text === 'Save' ? () => {
-        formik.handleSubmit();
-        closeDialog();
-      } : () => {
+      buttonFunction: button.text === 'Save' ? () => formik.handleSubmit() : () => {
         handleDiscardChanges();
       },
+      disabled: button.text === 'Save' && (isLoading || !formik.isValid),
       buttonText: button.text,
       variant: button.variant,
       color: button.color
@@ -312,6 +311,7 @@ const Form = _ref => {
   }, permissions.edit && /*#__PURE__*/_react.default.createElement(_Button.default, {
     variant: "contained",
     type: "submit",
+    disabled: isLoading || formik.isValid,
     color: "success",
     onClick: formik.handleSubmit
   }, "Save"), /*#__PURE__*/_react.default.createElement(_Button.default, {

@@ -288,8 +288,10 @@ const RenderColumns = _ref3 => {
 const getFormConfig = function getFormConfig(_ref4) {
   let {
     columns,
-    tabs = {}
+    tabs = {},
+    id
   } = _ref4;
+  console.log(columns, id);
   const formElements = [],
     tabColumns = {};
   for (const tab in tabs) {
@@ -311,7 +313,7 @@ const getFormConfig = function getFormConfig(_ref4) {
       otherProps.options = column.options;
     }
     const Component = fieldMappers[fieldType];
-    if (!Component) {
+    if (!Component || column.hideInAddGrid && id === '0') {
       continue;
     }
     const target = tab && tabs[tab] ? tabColumns[tab] : formElements;
@@ -361,7 +363,8 @@ const FormLayout = _ref5 => {
       tabColumns
     } = getFormConfig({
       columns: model.columns,
-      tabs: showTabs ? model.tabs : {}
+      tabs: showTabs ? model.tabs : {},
+      id: displayId
     });
     return {
       formElements,

@@ -177,7 +177,8 @@ const RenderColumns = ({ formElements, model, formik, data, onChange, combos, lo
 }
 
 
-const getFormConfig = function ({ columns, tabs = {} }) {
+const getFormConfig = function ({ columns, tabs = {}, id }) {
+    console.log(columns, id)
     const formElements = [], tabColumns = {};
     for (const tab in tabs) {
         tabColumns[tab] = [];
@@ -193,7 +194,7 @@ const getFormConfig = function ({ columns, tabs = {} }) {
             otherProps.options = column.options;
         }
         const Component = fieldMappers[fieldType];
-        if (!Component) {
+        if (!Component || (column.hideInAddGrid && id === '0')) {
             continue;
         }
         const target = tab && tabs[tab] ? tabColumns[tab] : formElements;
@@ -209,7 +210,7 @@ const getFormConfig = function ({ columns, tabs = {} }) {
 const FormLayout = ({ model, formik, data, combos, onChange, lookups, id: displayId, fieldConfigs, mode, handleSubmit }) => {
     const { formElements, tabColumns, showTabs } = React.useMemo(() => {
         let showTabs = model?.formConfig?.showTabbed;
-        const { formElements, tabColumns } = getFormConfig({ columns: model.columns, tabs: showTabs ? model.tabs : {} });
+        const { formElements, tabColumns } = getFormConfig({ columns: model.columns, tabs: showTabs ? model.tabs : {}, id: displayId });
         return { formElements, tabColumns, showTabs: showTabs && tabColumns.length > 0 };
     }, [model]);
     return (

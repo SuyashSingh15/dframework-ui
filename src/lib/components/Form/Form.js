@@ -60,7 +60,7 @@ const Form = ({
         enableReinitialize: true,
         initialValues: { ...model.initialValues, ...data },
         validationSchema: validationSchema,
-        validateOnBlur: false,
+        validateOnBlur: true,
         onSubmit: (values, { resetForm }) => {
             setIsLoading(true);
             const columns = model.columns.filter(item => item.isNotPayload).map(item => item.field);
@@ -76,6 +76,7 @@ const Form = ({
             })
                 .then(success => {
                     if (success) {
+                        closeDialog && closeDialog();
                         snackbar?.showMessage('Record Updated Successfully.');
                         // navigate('./');
                     }
@@ -194,7 +195,13 @@ const Form = ({
                     {actionButtons.map((button, index) => {
                         return (
                             <Box key={index} ml={2} mt={4} >
-                                <model.CustomButton buttonFunction={button.text === 'Save' ? () => { formik.handleSubmit(); closeDialog() } : () => { handleDiscardChanges() }} buttonText={button.text} variant={button.variant} color={button.color} />
+                                <model.CustomButton
+                                    buttonFunction={button.text === 'Save' ? () => formik.handleSubmit() : () => { handleDiscardChanges() }}
+                                    disabled={button.text === 'Save' && (isLoading || !formik.isValid)}
+                                    buttonText={button.text}
+                                    variant={button.variant}
+                                    color={button.color}
+                                />
                             </Box>
                         )
                     })}
@@ -214,7 +221,7 @@ const Form = ({
             <Paper sx={{ padding: 2 }}>
                 <form>
                     <Stack direction="row" spacing={2} justifyContent="flex-end" mb={1}>
-                        {permissions.edit && <Button variant="contained" type="submit" color="success" onClick={formik.handleSubmit}>Save</Button>}
+                        {permissions.edit && <Button variant="contained" type="submit" disabled={isLoading || formik.isValid} color="success" onClick={formik.handleSubmit}>Save</Button>}
                         <Button variant="contained" type="cancel" color="error" onClick={(e) => handleFormCancel(e)}>Cancel</Button>
                         {permissions.delete && <Button variant="contained" color="error" onClick={() => setIsDeleting(true)}>Delete</Button>}
                     </Stack>

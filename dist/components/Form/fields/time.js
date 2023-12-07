@@ -31,7 +31,6 @@ function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key i
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return typeof key === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (typeof input !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (typeof res !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); } // import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 const Field = _ref => {
-  var _column$dependentFiel, _column$dependentFiel2;
   let {
     column,
     field,
@@ -43,11 +42,16 @@ const Field = _ref => {
   } = _ref;
   const [timePeriod, setTimePeriod] = (0, _react.useState)("AM");
   const [time, setTime] = (0, _react.useState)(null);
+  // const [err, setErr] = useState(null);
+
   (0, _react.useEffect)(() => {
     if (formik.values[field]) {
       const dateTime = (0, _dayjs.default)(formik.values[field]);
       setTime(dateTime);
       setTimePeriod(dateTime.format("A"));
+    } else {
+      setTimePeriod("AM");
+      setTime(null);
     }
   }, [formik.values]);
   const handleRadioChange = event => {
@@ -55,6 +59,9 @@ const Field = _ref => {
     updateFormikTime(time, event.target.value);
   };
   const handleTimeChange = newTime => {
+    // if (err) {
+    //   newTime = dayjs(formik.values[column.dependentField.field]).add(5, 'minute')
+    // }
     setTime(newTime);
     updateFormikTime(newTime, timePeriod);
   };
@@ -68,9 +75,9 @@ const Field = _ref => {
       formik.setFieldValue(field, dateTime.toISOString());
     }
   };
-  console.log('plugin', column.dependentField, (column === null || column === void 0 || (_column$dependentFiel = column.dependentField) === null || _column$dependentFiel === void 0 ? void 0 : _column$dependentFiel.operator) === ">=", formik.values[column === null || column === void 0 || (_column$dependentFiel2 = column.dependentField) === null || _column$dependentFiel2 === void 0 ? void 0 : _column$dependentFiel2.field]);
+  console.log('plugin', formik.values, formik.errors, formik.touched);
   if (column.modifiedLabel) {
-    var _column$dependentFiel3;
+    var _column$dependentFiel;
     return /*#__PURE__*/_react.default.createElement("div", {
       style: {
         display: "flex",
@@ -80,20 +87,34 @@ const Field = _ref => {
       }
     }, /*#__PURE__*/_react.default.createElement(_LocalizationProvider.LocalizationProvider, {
       dateAdapter: _AdapterDayjs.AdapterDayjs
-    }, /*#__PURE__*/_react.default.createElement(_material.InputLabel, {
-      sx: {
-        margin: "1.8rem 2rem 2.5rem 0rem",
-        position: "absolute",
-        zIndex: "1",
-        transform: "translate(14px, -9px) scale(0.75)"
+    }, /*#__PURE__*/_react.default.createElement(_TimePicker.TimePicker, {
+      style: {
+        flex: 2
       }
-    }, column.label), /*#__PURE__*/_react.default.createElement(_TimePicker.TimePicker, {
-      variant: "standard",
-      value: time,
-      disabled: column.dependentField && formik.values[column.dependentField.field] === ""
-      // minTime={dayjs().set('hour', 5).startOf('hour')}
+      // label={<InputLabel
+      //   sx={{
+      //     margin: "1.8rem 2rem 2.5rem 0rem",
+      //     position: "absolute",
+      //     zIndex: "1",
+      //     transform: "translate(10px, -9px) scale(0.75)",
+      //     // color: formik.touched[field] && formik.errors[field] ? "#f44336" : "inherit"
+      //   }}
+      // >
+      //   {column.label}
+      // </InputLabel>}
       ,
-      minTime: (column === null || column === void 0 || (_column$dependentFiel3 = column.dependentField) === null || _column$dependentFiel3 === void 0 ? void 0 : _column$dependentFiel3.operator) === ">=" && formik.values[column.dependentField.field] !== "" ? (0, _dayjs.default)(formik.values[column.dependentField.field]).set("minute", 4) : null,
+      label: column.label,
+      value: time,
+      disabled: column.dependentField && formik.values[column.dependentField.field] === "",
+      slotProps: {
+        textField: {
+          helperText: formik.touched[field] && formik.errors[field],
+          error: formik.touched[field] && formik.errors[field],
+          variant: "filled",
+          placeholder: "hh:mm"
+        }
+      },
+      minTime: (column === null || column === void 0 || (_column$dependentFiel = column.dependentField) === null || _column$dependentFiel === void 0 ? void 0 : _column$dependentFiel.operator) === ">=" && formik.values[column.dependentField.field] !== "" ? (0, _dayjs.default)(formik.values[column.dependentField.field]).add(5, 'minute') : null,
       onChange: handleTimeChange,
       sx: {
         backgroundColor: "#4F5883 !important",
@@ -102,23 +123,13 @@ const Field = _ref => {
         },
         width: "200px"
       },
-      format: "hh:mm"
-      // label="hh:mm"
-      ,
+      format: "hh:mm",
       views: ["hours", "minutes"]
-      // components={{
-      //   OpenPickerIcon: KeyboardArrowDownIcon,
-      // }}
-      // renderInput={(params) => (
-      //   <TextField {...params} placeholder="select" />
-      // )}
-
-      // slots={{
-      //   textField: (params) => <TextField {...params} placeholder={column?.placeholder ? column?.placeholder : "hh:mm"} />,
-      //   openPickerIcon: KeyboardArrowDownIcon
-      // }}
     }), /*#__PURE__*/_react.default.createElement(_FormControl.default, {
-      component: "fieldset"
+      component: "fieldset",
+      style: {
+        flex: 1
+      }
     }, /*#__PURE__*/_react.default.createElement(_RadioGroup.default, {
       value: timePeriod,
       onChange: handleRadioChange,

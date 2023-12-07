@@ -48,11 +48,13 @@ const Field = ({
                         position: "absolute",
                         zIndex: "1",
                         transform: "translate(14px, -9px) scale(0.75)",
+                        color: formik.touched[field] && formik.errors[field] ? "#f44336" : "inherit"
                     }}
                 >
                     {column.label}
                 </InputLabel>
                 <Select
+                    error={formik.touched[field] && formik.errors[field]}
                     IconComponent={KeyboardArrowDownIcon}
                     {...otherProps}
                     name={field}
@@ -93,7 +95,7 @@ const Field = ({
                             </MenuItem>
                         ))}
                 </Select>
-                <FormHelperText>
+                <FormHelperText style={{ color: "#f44336" }}>
                     {formik.touched[field] && formik.errors[field]}
                 </FormHelperText>
             </FormControl>

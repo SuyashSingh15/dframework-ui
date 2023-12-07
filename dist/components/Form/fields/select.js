@@ -51,9 +51,11 @@ const Field = _ref => {
         margin: "0.9rem 2rem 1.5rem 0rem",
         position: "absolute",
         zIndex: "1",
-        transform: "translate(14px, -9px) scale(0.75)"
+        transform: "translate(14px, -9px) scale(0.75)",
+        color: formik.touched[field] && formik.errors[field] ? "#f44336" : "inherit"
       }
     }, column.label), /*#__PURE__*/_react.default.createElement(_material.Select, _extends({
+      error: formik.touched[field] && formik.errors[field],
       IconComponent: _KeyboardArrowDown.default
     }, otherProps, {
       name: field,
@@ -83,7 +85,11 @@ const Field = _ref => {
     }), Array.isArray(options) && options.map(option => /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
       key: option.value,
       value: option.value
-    }, option.label))), /*#__PURE__*/_react.default.createElement(_material.FormHelperText, null, formik.touched[field] && formik.errors[field]));
+    }, option.label))), /*#__PURE__*/_react.default.createElement(_material.FormHelperText, {
+      style: {
+        color: "#f44336"
+      }
+    }, formik.touched[field] && formik.errors[field]));
   } else {
     return /*#__PURE__*/_react.default.createElement(_material.FormControl, {
       fullWidth: true,
