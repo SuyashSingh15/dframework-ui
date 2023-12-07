@@ -1,7 +1,7 @@
 import React from 'react';
 import { useFormik } from 'formik';
 import { useState, useEffect, createContext } from 'react';
-import { getRecord, saveRecord, deleteRecord } from '../Grid/crud-helper';
+import { getRecord, saveRecord, deleteRecord, getList } from '../Grid/crud-helper';
 import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
 import { Box } from "@mui/material";
@@ -19,7 +19,8 @@ const Form = ({
     permissions = { edit: true, export: true, delete: true },
     Layout = FormLayout,
     ids,
-    closeDialog
+    closeDialog,
+    fetchData
 }) => {
     const { navigate, getParams } = useRouter();
     const defaultFieldConfigs = {}
@@ -77,6 +78,10 @@ const Form = ({
                 .then(success => {
                     if (success) {
                         closeDialog && closeDialog();
+                        model.addHeaderFilters === false && fetchData && fetchData();
+                        if (getList && !fetchData) {
+                            getList();
+                        }
                         snackbar?.showMessage('Record Updated Successfully.');
                         // navigate('./');
                     }

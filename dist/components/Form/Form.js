@@ -46,7 +46,8 @@ const Form = _ref => {
     },
     Layout = _fieldMapper.default,
     ids,
-    closeDialog
+    closeDialog,
+    fetchData
   } = _ref;
   const {
     navigate,
@@ -116,6 +117,10 @@ const Form = _ref => {
       }).then(success => {
         if (success) {
           closeDialog && closeDialog();
+          model.addHeaderFilters === false && fetchData && fetchData();
+          if (_crudHelper.getList && !fetchData) {
+            (0, _crudHelper.getList)();
+          }
           snackbar === null || snackbar === void 0 || snackbar.showMessage('Record Updated Successfully.');
           // navigate('./');
         }

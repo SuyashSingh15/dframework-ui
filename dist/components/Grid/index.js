@@ -816,6 +816,7 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
     hideButtons: true
   }, /*#__PURE__*/_react.default.createElement(model.Form, {
     ids: String(record.id),
+    fetchData: fetchData,
     closeDialog: closingDialog
   })), /*#__PURE__*/_react.default.createElement(_Menu.default, {
     anchorEl: anchorEl,
