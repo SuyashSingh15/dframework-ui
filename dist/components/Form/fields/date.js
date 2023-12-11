@@ -61,6 +61,7 @@ const Field = _ref => {
           padding: '1.65625rem 0.875rem 0.59375rem 0.875rem !important'
         }
       },
+      disableFuture: column.disableFuture,
       name: field,
       value: dateValue,
       onChange: value => formik.setFieldValue(field, value),
