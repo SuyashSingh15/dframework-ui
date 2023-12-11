@@ -42,8 +42,6 @@ const Field = _ref => {
   } = _ref;
   const [timePeriod, setTimePeriod] = (0, _react.useState)("AM");
   const [time, setTime] = (0, _react.useState)(null);
-  // const [err, setErr] = useState(null);
-
   (0, _react.useEffect)(() => {
     if (formik.values[field]) {
       const dateTime = (0, _dayjs.default)(formik.values[field]);

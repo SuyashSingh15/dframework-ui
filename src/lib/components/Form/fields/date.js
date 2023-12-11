@@ -8,7 +8,7 @@ import TextField from '@mui/material/TextField';
 import dayjs from 'dayjs';
 
 const Field = ({ column, field, fieldLabel, formik, otherProps, classes, fieldConfigs }) => {
-    const isDisabled = fieldConfigs?.disabled;
+    const isDisabled = (fieldConfigs?.disabled) || (column.dependentField && formik.values[column.dependentField.field] === "");
 
     if (column.modifiedLabel) {
         console.log(formik.touched[field], formik.errors[field], formik.touched[field] && Boolean(formik.errors[field]))
@@ -23,6 +23,7 @@ const Field = ({ column, field, fieldLabel, formik, otherProps, classes, fieldCo
                 <DatePicker
                     {...otherProps}
                     variant="standard"
+                    minDate={column?.dependentField?.operator === ">=" && formik.values[column.dependentField.field] !== "" ? dayjs(formik.values[column.dependentField.field]) : null}
                     readOnly={column?.readOnly === true}
                     key={field}
                     fullWidth

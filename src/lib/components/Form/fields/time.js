@@ -14,7 +14,6 @@ import dayjs from "dayjs";
 const Field = ({ column, field, fieldLabel, formik, otherProps, classes, onChange }) => {
   const [timePeriod, setTimePeriod] = useState("AM");
   const [time, setTime] = useState(null);
-  // const [err, setErr] = useState(null);
 
   useEffect(() => {
     if (formik.values[field]) {
