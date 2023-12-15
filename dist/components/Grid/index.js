@@ -57,7 +57,8 @@ const sortRegex = /(\w+)( ASC| DESC)?/i;
 const actionTypes = {
   Copy: "Copy",
   Edit: "Edit",
-  Delete: "Delete"
+  Delete: "Delete",
+  Custom: "Custom"
 };
 const constants = {
   gridFilterModel: {
@@ -864,7 +865,10 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
   }, (model.canEdit === undefined || model.canEdit) && /*#__PURE__*/_react.default.createElement(ActionMenuItem, {
     actionType: actionTypes.Edit,
     handler: () => handleMenuEdit(selectedRecord)
-  }, "Edit"), (model.canDelete === undefined || model.canDelete) && /*#__PURE__*/_react.default.createElement(ActionMenuItem, {
+  }, "Edit"), !!model.openModLogModal && /*#__PURE__*/_react.default.createElement(ActionMenuItem, {
+    actionType: actionTypes.Custom,
+    handler: () => model.openModLogModal(selectedRecord)
+  }, "Show history"), (model.canDelete === undefined || model.canDelete) && /*#__PURE__*/_react.default.createElement(ActionMenuItem, {
     actionType: actionTypes.Delete,
     handler: () => handleMenuDelete(selectedRecord)
   }, "Delete")));

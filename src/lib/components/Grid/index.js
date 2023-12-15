@@ -37,7 +37,8 @@ const sortRegex = /(\w+)( ASC| DESC)?/i;
 const actionTypes = {
     Copy: "Copy",
     Edit: "Edit",
-    Delete: "Delete"
+    Delete: "Delete",
+    Custom: "Custom"
 };
 const constants = {
     gridFilterModel: { items: [], logicOperator: 'and', quickFilterValues: Array(0), quickFilterLogicOperator: 'and' },
@@ -695,6 +696,7 @@ const GridBase = memo(({
                 anchorOrigin={{ horizontal: 'right', vertical: 'center' }}
             >
                 {(model.canEdit === undefined || model.canEdit) && <ActionMenuItem actionType={actionTypes.Edit} handler={() => handleMenuEdit(selectedRecord)}>Edit</ActionMenuItem>}
+                {!!model.openModLogModal && <ActionMenuItem actionType={actionTypes.Custom} handler={() => model.openModLogModal(selectedRecord)}>Show history</ActionMenuItem>}
                 {(model.canDelete === undefined || model.canDelete) && <ActionMenuItem actionType={actionTypes.Delete} handler={() => handleMenuDelete(selectedRecord)}>Delete</ActionMenuItem>}
             </Menu>
         </div >
