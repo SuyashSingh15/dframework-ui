@@ -16,6 +16,14 @@ const Field = ({ column, field, fieldLabel, formik, otherProps, classes, onChang
   const [time, setTime] = useState(null);
 
   useEffect(() => {
+    if (column?.dependentField?.operator === ">=" && formik.values[column.dependentField.field] !== "" && !formik.values[field]) {
+      const dateTime = dayjs(formik.values[column.dependentField.field]).add(10, 'minute');
+      if (dateTime.get("hour") > 12) {
+        setTimePeriod("PM");
+      }
+      formik.setFieldValue(field, dateTime.toISOString());
+    }
+    // : null
     if (formik.values[field]) {
       const dateTime = dayjs(formik.values[field]);
       setTime(dateTime);
@@ -55,19 +63,7 @@ const Field = ({ column, field, fieldLabel, formik, otherProps, classes, onChang
       <div
         style={{ display: "flex", alignItems: "center", gap: '2.9rem', width: '337px !important' }}>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-
           <TimePicker style={{ flex: 2 }}
-            // label={<InputLabel
-            //   sx={{
-            //     margin: "1.8rem 2rem 2.5rem 0rem",
-            //     position: "absolute",
-            //     zIndex: "1",
-            //     transform: "translate(10px, -9px) scale(0.75)",
-            //     // color: formik.touched[field] && formik.errors[field] ? "#f44336" : "inherit"
-            //   }}
-            // >
-            //   {column.label}
-            // </InputLabel>}
             label={column.label}
             value={time}
             disabled={column.dependentField && formik.values[column.dependentField.field] === ""}
@@ -79,6 +75,8 @@ const Field = ({ column, field, fieldLabel, formik, otherProps, classes, onChang
                 placeholder: "hh:mm"
               },
             }}
+            // ampm={false}
+            closeOnSelect={false}
             minTime={column?.dependentField?.operator === ">=" && formik.values[column.dependentField.field] !== "" ? dayjs(formik.values[column.dependentField.field]).add(5, 'minute') : null}
             onChange={handleTimeChange}
             sx={{

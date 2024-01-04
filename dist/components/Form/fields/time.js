@@ -43,6 +43,15 @@ const Field = _ref => {
   const [timePeriod, setTimePeriod] = (0, _react.useState)("AM");
   const [time, setTime] = (0, _react.useState)(null);
   (0, _react.useEffect)(() => {
+    var _column$dependentFiel;
+    if ((column === null || column === void 0 || (_column$dependentFiel = column.dependentField) === null || _column$dependentFiel === void 0 ? void 0 : _column$dependentFiel.operator) === ">=" && formik.values[column.dependentField.field] !== "" && !formik.values[field]) {
+      const dateTime = (0, _dayjs.default)(formik.values[column.dependentField.field]).add(10, 'minute');
+      if (dateTime.get("hour") > 12) {
+        setTimePeriod("PM");
+      }
+      formik.setFieldValue(field, dateTime.toISOString());
+    }
+    // : null
     if (formik.values[field]) {
       const dateTime = (0, _dayjs.default)(formik.values[field]);
       setTime(dateTime);
@@ -75,7 +84,7 @@ const Field = _ref => {
   };
   console.log('plugin', formik.values, formik.errors, formik.touched);
   if (column.modifiedLabel) {
-    var _column$dependentFiel;
+    var _column$dependentFiel2;
     return /*#__PURE__*/_react.default.createElement("div", {
       style: {
         display: "flex",
@@ -88,19 +97,7 @@ const Field = _ref => {
     }, /*#__PURE__*/_react.default.createElement(_TimePicker.TimePicker, {
       style: {
         flex: 2
-      }
-      // label={<InputLabel
-      //   sx={{
-      //     margin: "1.8rem 2rem 2.5rem 0rem",
-      //     position: "absolute",
-      //     zIndex: "1",
-      //     transform: "translate(10px, -9px) scale(0.75)",
-      //     // color: formik.touched[field] && formik.errors[field] ? "#f44336" : "inherit"
-      //   }}
-      // >
-      //   {column.label}
-      // </InputLabel>}
-      ,
+      },
       label: column.label,
       value: time,
       disabled: column.dependentField && formik.values[column.dependentField.field] === "",
@@ -111,8 +108,11 @@ const Field = _ref => {
           variant: "filled",
           placeholder: "hh:mm"
         }
-      },
-      minTime: (column === null || column === void 0 || (_column$dependentFiel = column.dependentField) === null || _column$dependentFiel === void 0 ? void 0 : _column$dependentFiel.operator) === ">=" && formik.values[column.dependentField.field] !== "" ? (0, _dayjs.default)(formik.values[column.dependentField.field]).add(5, 'minute') : null,
+      }
+      // ampm={false}
+      ,
+      closeOnSelect: false,
+      minTime: (column === null || column === void 0 || (_column$dependentFiel2 = column.dependentField) === null || _column$dependentFiel2 === void 0 ? void 0 : _column$dependentFiel2.operator) === ">=" && formik.values[column.dependentField.field] !== "" ? (0, _dayjs.default)(formik.values[column.dependentField.field]).add(5, 'minute') : null,
       onChange: handleTimeChange,
       sx: {
         backgroundColor: "#4F5883 !important",
