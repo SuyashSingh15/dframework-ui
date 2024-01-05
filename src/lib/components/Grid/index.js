@@ -158,7 +158,8 @@ const GridBase = memo(({
     gridFooter = model.gridFooter || Footer,
     advanceFilter,
     closeDialog,
-    selectedId
+    selectedId,
+    ...props
 }) => {
     const [paginationModel, setPaginationModel] = useState({ pageSize: defaultPageSize, page: 0 });
     const [data, setData] = useState({ recordCount: 0, records: [], lookups: {} });
@@ -201,6 +202,7 @@ const GridBase = memo(({
 
     useEffect(() => {
         dataRef.current = data;
+        console.log('effect', data.records);
     }, [data]);
     const lookupOptions = ({ row, field, id, ...others }) => {
         const lookupData = dataRef.current.lookups || {};
@@ -489,6 +491,7 @@ const GridBase = memo(({
     };
 
     const closingDialog = () => {
+        closeDialog();
         setIsEdit(false);
     };
 
@@ -560,20 +563,27 @@ const GridBase = memo(({
     );
 
     const processRowUpdate = (updatedRow) => {
-        setIsLoading(true);
-        saveRecord({
-            id: updatedRow[idProperty],
-            api: api || model?.api,
-            values: updatedRow,
-            setIsLoading,
-            setError: snackbar?.showError
-        })
-            .then(success => {
-                if (success) {
-                    snackbar?.showMessage('Record Updated Successfully.');
-                }
-            })
-            .finally(() => setIsLoading(false));
+        // setIsLoading(true);
+        if (props.processRowUpdate) {
+            props.processRowUpdate(updatedRow, data);
+            // return updatedRow;
+            // console.log(props.processRowUpdate);
+        }
+        console.log('row updated', updatedRow, data);
+        // setIsLoading(false)
+        // saveRecord({
+        //     id: updatedRow[idProperty],
+        //     api: api || model?.api,
+        //     values: updatedRow,
+        //     setIsLoading,
+        //     setError: snackbar?.showError
+        // })
+        //     .then(success => {
+        //         if (success) {
+        //             snackbar?.showMessage('Record Updated Successfully.');
+        //         }
+        //     })
+        //     .finally(() => setIsLoading(false));
         return updatedRow
     }
 

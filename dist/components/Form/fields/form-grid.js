@@ -23,6 +23,7 @@ const useStyles = (0, _core.makeStyles)({
   }
 });
 const TransferField = _ref => {
+  var _props$column;
   let {
       component,
       name,
@@ -40,11 +41,13 @@ const TransferField = _ref => {
   } = formik;
   const Component = component || props.column.grid;
   const classes = useStyles();
+  console.log('formGrid', props, component);
   const onAssignChange = (0, _react.useCallback)(value => {
     setFieldValue(name || field, value);
   }, [setFieldValue, name, field]);
   return /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement(Component, {
-    selectedId: props.id
+    selectedId: props.id,
+    processRowUpdate: (_props$column = props.column) === null || _props$column === void 0 ? void 0 : _props$column.processRowUpdate
   }));
 };
 var _default = exports.default = TransferField;

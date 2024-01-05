@@ -116,6 +116,7 @@ const Form = _ref => {
         setError: snackbar === null || snackbar === void 0 ? void 0 : snackbar.showError
       }).then(success => {
         if (success) {
+          console.log(closeDialog);
           closeDialog && closeDialog();
           model.addHeaderFilters === false && fetchData && fetchData();
           if (_crudHelper.getList && !fetchData) {

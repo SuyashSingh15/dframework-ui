@@ -15,6 +15,7 @@ const defaultValueConfigs = {
     "oneToMany": ""
 }
 class UiModel {
+
     constructor(modelConfig) {
         const { title, controllerType, url } = modelConfig;
         let { api, idProperty = api + 'Id' } = modelConfig;

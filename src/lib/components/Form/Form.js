@@ -77,7 +77,7 @@ const Form = ({
             })
                 .then(success => {
                     if (success) {
-                        closeDialog && closeDialog();
+                        closeDialog?.();
                         model.addHeaderFilters === false && fetchData && fetchData();
                         if (getList && !fetchData) {
                             getList();

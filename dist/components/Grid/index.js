@@ -18,7 +18,6 @@ require("core-js/modules/es.promise.js");
 require("core-js/modules/es.array.includes.js");
 require("core-js/modules/es.string.includes.js");
 require("core-js/modules/es.parse-int.js");
-require("core-js/modules/es.promise.finally.js");
 var _Button = _interopRequireDefault(require("@mui/material/Button"));
 var _react = _interopRequireWildcard(require("react"));
 var _xDataGridPremium = require("@mui/x-data-grid-premium");
@@ -40,17 +39,18 @@ var _dayjs = _interopRequireDefault(require("dayjs"));
 var _footer = require("./footer");
 var _useRouter = require("../useRouter/useRouter");
 var _template = _interopRequireDefault(require("./template"));
-const _excluded = ["row", "field", "id"];
+const _excluded = ["useLinkColumn", "model", "columns", "api", "defaultSort", "setActiveRecord", "parentFilters", "parent", "where", "title", "showModal", "OrderModal", "permissions", "selected", "assigned", "available", "onAssignChange", "customStyle", "onCellClick", "showRowsSelected", "gridFooter", "advanceFilter", "closeDialog", "selectedId"],
+  _excluded2 = ["row", "field", "id"];
 function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function _getRequireWildcardCache(e) { return e ? t : r; })(e); }
 function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != typeof e && "function" != typeof e) return { default: e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && Object.prototype.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n.default = e, t && t.set(e, n), n; }
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-function _objectWithoutProperties(source, excluded) { if (source == null) return {}; var target = _objectWithoutPropertiesLoose(source, excluded); var key, i; if (Object.getOwnPropertySymbols) { var sourceSymbolKeys = Object.getOwnPropertySymbols(source); for (i = 0; i < sourceSymbolKeys.length; i++) { key = sourceSymbolKeys[i]; if (excluded.indexOf(key) >= 0) continue; if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue; target[key] = source[key]; } } return target; }
-function _objectWithoutPropertiesLoose(source, excluded) { if (source == null) return {}; var target = {}; var sourceKeys = Object.keys(source); var key, i; for (i = 0; i < sourceKeys.length; i++) { key = sourceKeys[i]; if (excluded.indexOf(key) >= 0) continue; target[key] = source[key]; } return target; }
 function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
 function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == typeof i ? i : String(i); }
 function _toPrimitive(t, r) { if ("object" != typeof t || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != typeof i) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
+function _objectWithoutProperties(source, excluded) { if (source == null) return {}; var target = _objectWithoutPropertiesLoose(source, excluded); var key, i; if (Object.getOwnPropertySymbols) { var sourceSymbolKeys = Object.getOwnPropertySymbols(source); for (i = 0; i < sourceSymbolKeys.length; i++) { key = sourceSymbolKeys[i]; if (excluded.indexOf(key) >= 0) continue; if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue; target[key] = source[key]; } } return target; }
+function _objectWithoutPropertiesLoose(source, excluded) { if (source == null) return {}; var target = {}; var sourceKeys = Object.keys(source); var key, i; for (i = 0; i < sourceKeys.length; i++) { key = sourceKeys[i]; if (excluded.indexOf(key) >= 0) continue; target[key] = source[key]; } return target; }
 function _extends() { _extends = Object.assign ? Object.assign.bind() : function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
 const defaultPageSize = 10;
 const sortRegex = /(\w+)( ASC| DESC)?/i;
@@ -181,31 +181,32 @@ const areEqual = function areEqual() {
 };
 const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
   let {
-    useLinkColumn = true,
-    model,
-    columns,
-    api,
-    defaultSort,
-    setActiveRecord,
-    parentFilters,
-    parent,
-    where,
-    title,
-    showModal,
-    OrderModal,
-    permissions = constants.permissions,
-    selected,
-    assigned,
-    available,
-    onAssignChange,
-    customStyle,
-    onCellClick,
-    showRowsSelected,
-    gridFooter = model.gridFooter || _footer.Footer,
-    advanceFilter,
-    closeDialog,
-    selectedId
-  } = _ref2;
+      useLinkColumn = true,
+      model,
+      columns,
+      api,
+      defaultSort,
+      setActiveRecord,
+      parentFilters,
+      parent,
+      where,
+      title,
+      showModal,
+      OrderModal,
+      permissions = constants.permissions,
+      selected,
+      assigned,
+      available,
+      onAssignChange,
+      customStyle,
+      onCellClick,
+      showRowsSelected,
+      gridFooter = model.gridFooter || _footer.Footer,
+      advanceFilter,
+      closeDialog,
+      selectedId
+    } = _ref2,
+    props = _objectWithoutProperties(_ref2, _excluded);
   const [paginationModel, setPaginationModel] = (0, _react.useState)({
     pageSize: defaultPageSize,
     page: 0
@@ -264,6 +265,7 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
   const open = Boolean(anchorEl);
   (0, _react.useEffect)(() => {
     dataRef.current = data;
+    console.log('effect', data.records);
   }, [data]);
   const lookupOptions = _ref3 => {
     let {
@@ -271,7 +273,7 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
         field,
         id
       } = _ref3,
-      others = _objectWithoutProperties(_ref3, _excluded);
+      others = _objectWithoutProperties(_ref3, _excluded2);
     const lookupData = dataRef.current.lookups || {};
     return lookupData[lookupMap[field].lookup] || [];
   };
@@ -625,6 +627,8 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
     return row[idProperty];
   };
   const closingDialog = () => {
+    console.log(closeDialog);
+    closeDialog();
     setIsEdit(false);
   };
   const handleExport = e => {
@@ -712,18 +716,27 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
     }, children);
   };
   const processRowUpdate = updatedRow => {
-    setIsLoading(true);
-    (0, _crudHelper.saveRecord)({
-      id: updatedRow[idProperty],
-      api: api || (model === null || model === void 0 ? void 0 : model.api),
-      values: updatedRow,
-      setIsLoading,
-      setError: snackbar === null || snackbar === void 0 ? void 0 : snackbar.showError
-    }).then(success => {
-      if (success) {
-        snackbar === null || snackbar === void 0 || snackbar.showMessage('Record Updated Successfully.');
-      }
-    }).finally(() => setIsLoading(false));
+    // setIsLoading(true);
+    if (props.processRowUpdate) {
+      props.processRowUpdate(updatedRow, data);
+      // return updatedRow;
+      // console.log(props.processRowUpdate);
+    }
+    console.log('row updated', updatedRow, data);
+    // setIsLoading(false)
+    // saveRecord({
+    //     id: updatedRow[idProperty],
+    //     api: api || model?.api,
+    //     values: updatedRow,
+    //     setIsLoading,
+    //     setError: snackbar?.showError
+    // })
+    //     .then(success => {
+    //         if (success) {
+    //             snackbar?.showMessage('Record Updated Successfully.');
+    //         }
+    //     })
+    //     .finally(() => setIsLoading(false));
     return updatedRow;
   };
   return /*#__PURE__*/_react.default.createElement("div", {
