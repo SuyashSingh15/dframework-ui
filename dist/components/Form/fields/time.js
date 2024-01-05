@@ -16,7 +16,6 @@ var _Radio = _interopRequireDefault(require("@mui/material/Radio"));
 var _RadioGroup = _interopRequireDefault(require("@mui/material/RadioGroup"));
 var _FormControlLabel = _interopRequireDefault(require("@mui/material/FormControlLabel"));
 var _FormControl = _interopRequireDefault(require("@mui/material/FormControl"));
-var _material = require("@mui/material");
 var _TimePicker = require("@mui/x-date-pickers/TimePicker");
 var _AdapterDayjs = require("@mui/x-date-pickers/AdapterDayjs");
 var _LocalizationProvider = require("@mui/x-date-pickers/LocalizationProvider");
@@ -44,23 +43,15 @@ const Field = _ref => {
   const [time, setTime] = (0, _react.useState)(null);
   (0, _react.useEffect)(() => {
     var _column$dependentFiel;
-    console.log(field, formik.values[field]);
+    // console.log(field, formik.values[field])
     if ((column === null || column === void 0 || (_column$dependentFiel = column.dependentField) === null || _column$dependentFiel === void 0 ? void 0 : _column$dependentFiel.operator) === ">=" && formik.values[column.dependentField.field] !== "" && !formik.values[field]) {
       const dateTime = (0, _dayjs.default)(formik.values[column.dependentField.field]).add(5, 'minute');
       if (dateTime.get("hour") > 12) {
         setTimePeriod("PM");
         updateFormikTime(time, "PM");
-        // setTime(dateTime);
-        // updateFormikTime(null, "PM")
-        // formik.setFieldValue(field, dateTime.hour(dateTime.get("hour") + 12).toISOString())
       } else {
         setTimePeriod("AM");
         updateFormikTime(time, "AM");
-
-        // updateFormikTime(null, "AM");
-        // formik.setFieldValue(field, dateTime.toISOString())
-        // setTime(dateTime);
-        // updateFormikTime(dateTime, "AM")
       }
     }
     if (formik.values[field]) {
@@ -68,10 +59,6 @@ const Field = _ref => {
       setTime(dateTime);
       setTimePeriod(dateTime.format("A"));
     }
-    // else {
-    //   setTimePeriod("AM");
-    //   setTime(null);
-    // }
   }, [formik.values]);
   const handleRadioChange = event => {
     setTimePeriod(event.target.value);
