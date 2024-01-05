@@ -44,22 +44,34 @@ const Field = _ref => {
   const [time, setTime] = (0, _react.useState)(null);
   (0, _react.useEffect)(() => {
     var _column$dependentFiel;
+    console.log(field, formik.values[field]);
     if ((column === null || column === void 0 || (_column$dependentFiel = column.dependentField) === null || _column$dependentFiel === void 0 ? void 0 : _column$dependentFiel.operator) === ">=" && formik.values[column.dependentField.field] !== "" && !formik.values[field]) {
-      const dateTime = (0, _dayjs.default)(formik.values[column.dependentField.field]).add(10, 'minute');
+      const dateTime = (0, _dayjs.default)(formik.values[column.dependentField.field]).add(5, 'minute');
       if (dateTime.get("hour") > 12) {
         setTimePeriod("PM");
+        updateFormikTime(time, "PM");
+        // setTime(dateTime);
+        // updateFormikTime(null, "PM")
+        // formik.setFieldValue(field, dateTime.hour(dateTime.get("hour") + 12).toISOString())
+      } else {
+        setTimePeriod("AM");
+        updateFormikTime(time, "AM");
+
+        // updateFormikTime(null, "AM");
+        // formik.setFieldValue(field, dateTime.toISOString())
+        // setTime(dateTime);
+        // updateFormikTime(dateTime, "AM")
       }
-      formik.setFieldValue(field, dateTime.toISOString());
     }
-    // : null
     if (formik.values[field]) {
       const dateTime = (0, _dayjs.default)(formik.values[field]);
       setTime(dateTime);
       setTimePeriod(dateTime.format("A"));
-    } else {
-      setTimePeriod("AM");
-      setTime(null);
     }
+    // else {
+    //   setTimePeriod("AM");
+    //   setTime(null);
+    // }
   }, [formik.values]);
   const handleRadioChange = event => {
     setTimePeriod(event.target.value);
@@ -82,7 +94,7 @@ const Field = _ref => {
       formik.setFieldValue(field, dateTime.toISOString());
     }
   };
-  console.log('plugin', formik.values, formik.errors, formik.touched);
+  // console.log('plugin', formik.values, formik.errors, formik.touched);
   if (column.modifiedLabel) {
     var _column$dependentFiel2;
     return /*#__PURE__*/_react.default.createElement("div", {

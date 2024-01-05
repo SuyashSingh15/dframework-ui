@@ -4,7 +4,6 @@ import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
-import { InputLabel } from "@mui/material";
 // import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -16,21 +15,21 @@ const Field = ({ column, field, fieldLabel, formik, otherProps, classes, onChang
   const [time, setTime] = useState(null);
 
   useEffect(() => {
+    // console.log(field, formik.values[field])
     if (column?.dependentField?.operator === ">=" && formik.values[column.dependentField.field] !== "" && !formik.values[field]) {
-      const dateTime = dayjs(formik.values[column.dependentField.field]).add(10, 'minute');
+      const dateTime = dayjs(formik.values[column.dependentField.field]).add(5, 'minute');
       if (dateTime.get("hour") > 12) {
         setTimePeriod("PM");
+        updateFormikTime(time, "PM");
+      } else {
+        setTimePeriod("AM");
+        updateFormikTime(time, "AM");
       }
-      formik.setFieldValue(field, dateTime.toISOString());
     }
-    // : null
     if (formik.values[field]) {
       const dateTime = dayjs(formik.values[field]);
       setTime(dateTime);
       setTimePeriod(dateTime.format("A"));
-    } else {
-      setTimePeriod("AM");
-      setTime(null);
     }
   }, [formik.values]);
 
@@ -57,7 +56,7 @@ const Field = ({ column, field, fieldLabel, formik, otherProps, classes, onChang
       formik.setFieldValue(field, dateTime.toISOString());
     }
   };
-  console.log('plugin', formik.values, formik.errors, formik.touched);
+  // console.log('plugin', formik.values, formik.errors, formik.touched);
   if (column.modifiedLabel) {
     return (
       <div
