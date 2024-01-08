@@ -16,13 +16,14 @@ const TransferField = ({ component, name, field, formik, type, model, ...props }
     const { setFieldValue } = formik;
     const Component = component || props.column.grid;
     const classes = useStyles();
-    console.log('formGrid', props, component);
     const onAssignChange = useCallback((value) => {
         setFieldValue(name || field, value);
     }, [setFieldValue, name, field]);
     return (
         <div>
-            <Component selectedId={props.id} processRowUpdate={props.column?.processRowUpdate} />
+            <Component selectedId={props.id} processRowUpdate={props.column?.processRowUpdate}
+            // resetChildGrid={props.column.resetChildGrid}
+            />
         </div>
     )
 }

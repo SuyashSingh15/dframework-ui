@@ -20,7 +20,8 @@ const Form = ({
     Layout = FormLayout,
     ids,
     closeDialog,
-    fetchData
+    fetchData,
+    resetChildGrid  //boolean
 }) => {
     const { navigate, getParams } = useRouter();
     const defaultFieldConfigs = {}
@@ -40,7 +41,7 @@ const Form = ({
     const [errorMessage, setErrorMessage] = useState('');
     const fieldConfigs = model?.applyFieldConfig ? model?.applyFieldConfig({ data, lookups }) : defaultFieldConfigs;
 
-    useEffect(() => {
+    const getInitialData = () => {
         setValidationSchema(model.getValidationSchema({ id, snackbar }));
         const options = idWithOptions?.split('-');
         try {
@@ -55,7 +56,8 @@ const Form = ({
             snackbar?.showMessage('An error occured, please try after some time.');
             // navigate('./');
         }
-    }, [id, idWithOptions, model]);
+    }
+    useEffect(getInitialData, [id, idWithOptions, model]);
 
     const formik = useFormik({
         enableReinitialize: true,
@@ -98,9 +100,14 @@ const Form = ({
     const { dirty } = formik;
 
     const handleDiscardChanges = () => {
-        formik.resetForm();
-        setIsDiscardDialogOpen(false);
-        // navigate('.');
+        console.log("handle discrad", resetChildGrid)
+        if (resetChildGrid) {
+            getInitialData();
+        }
+        else {
+            formik.resetForm();
+            setIsDiscardDialogOpen(false);
+        }
     };
 
     const handleDiscardChangesCloseDialog = () => {

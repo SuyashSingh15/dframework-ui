@@ -218,7 +218,8 @@ const RenderColumns = _ref3 => {
     lookups,
     fieldConfigs,
     mode,
-    id
+    id,
+    resetChildGrid
   } = _ref3;
   const classes = useStyles();
   if (!(formElements !== null && formElements !== void 0 && formElements.length)) {
@@ -254,6 +255,7 @@ const RenderColumns = _ref3 => {
       xs: isGridComponent ? 12 : gridStyle,
       className: classes.childStyles
     }, /*#__PURE__*/React.createElement(Component, _extends({
+      resetChildGrid: resetChildGrid,
       model: model,
       fieldConfigs: fieldConfigs[field],
       column: column,

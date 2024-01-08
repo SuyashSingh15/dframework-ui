@@ -127,7 +127,7 @@ const RenderSteps = ({ tabColumns, model, formik, data, onChange, combos, lookup
     )
 }
 
-const RenderColumns = ({ formElements, model, formik, data, onChange, combos, lookups, fieldConfigs, mode, id }) => {
+const RenderColumns = ({ formElements, model, formik, data, onChange, combos, lookups, fieldConfigs, mode, id, resetChildGrid }) => {
     const classes = useStyles();
     if (!formElements?.length) {
         return null;
@@ -145,7 +145,7 @@ const RenderColumns = ({ formElements, model, formik, data, onChange, combos, lo
                     : null
                 }
                 <Grid item xs={isGridComponent ? 12 : gridStyle} className={classes.childStyles}>
-                    <Component model={model} fieldConfigs={fieldConfigs[field]} column={column} mode={mode} field={field} fieldLabel={fieldLabel} formik={formik} data={data} onChange={onChange} combos={combos} lookups={lookups} id={id} {...otherProps} />
+                    <Component resetChildGrid={resetChildGrid} model={model} fieldConfigs={fieldConfigs[field]} column={column} mode={mode} field={field} fieldLabel={fieldLabel} formik={formik} data={data} onChange={onChange} combos={combos} lookups={lookups} id={id} {...otherProps} />
                 </Grid>
             </Grid >
         );

@@ -47,7 +47,8 @@ const Form = _ref => {
     Layout = _fieldMapper.default,
     ids,
     closeDialog,
-    fetchData
+    fetchData,
+    resetChildGrid //boolean
   } = _ref;
   const {
     navigate,
@@ -74,7 +75,7 @@ const Form = _ref => {
     data,
     lookups
   }) : defaultFieldConfigs;
-  (0, _react.useEffect)(() => {
+  const getInitialData = () => {
     setValidationSchema(model.getValidationSchema({
       id,
       snackbar
@@ -92,7 +93,8 @@ const Form = _ref => {
       snackbar === null || snackbar === void 0 || snackbar.showMessage('An error occured, please try after some time.');
       // navigate('./');
     }
-  }, [id, idWithOptions, model]);
+  };
+  (0, _react.useEffect)(getInitialData, [id, idWithOptions, model]);
   const formik = (0, _formik.useFormik)({
     enableReinitialize: true,
     initialValues: _objectSpread(_objectSpread({}, model.initialValues), data),
@@ -116,8 +118,7 @@ const Form = _ref => {
         setError: snackbar === null || snackbar === void 0 ? void 0 : snackbar.showError
       }).then(success => {
         if (success) {
-          console.log(closeDialog);
-          closeDialog && closeDialog();
+          closeDialog === null || closeDialog === void 0 || closeDialog();
           model.addHeaderFilters === false && fetchData && fetchData();
           if (_crudHelper.getList && !fetchData) {
             (0, _crudHelper.getList)();
@@ -136,9 +137,13 @@ const Form = _ref => {
     dirty
   } = formik;
   const handleDiscardChanges = () => {
-    formik.resetForm();
-    setIsDiscardDialogOpen(false);
-    // navigate('.');
+    console.log("handle discrad", resetChildGrid);
+    if (resetChildGrid) {
+      getInitialData();
+    } else {
+      formik.resetForm();
+      setIsDiscardDialogOpen(false);
+    }
   };
   const handleDiscardChangesCloseDialog = () => {
     formik.resetForm();
