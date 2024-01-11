@@ -39,7 +39,7 @@ var _dayjs = _interopRequireDefault(require("dayjs"));
 var _footer = require("./footer");
 var _useRouter = require("../useRouter/useRouter");
 var _template = _interopRequireDefault(require("./template"));
-const _excluded = ["useLinkColumn", "model", "columns", "api", "defaultSort", "setActiveRecord", "parentFilters", "parent", "where", "title", "showModal", "OrderModal", "permissions", "selected", "assigned", "available", "onAssignChange", "customStyle", "onCellClick", "showRowsSelected", "gridFooter", "advanceFilter", "closeDialog", "resetChildGrid", "selectedId"],
+const _excluded = ["useLinkColumn", "model", "columns", "api", "defaultSort", "setActiveRecord", "parentFilters", "parent", "where", "title", "showModal", "OrderModal", "permissions", "selected", "assigned", "available", "onAssignChange", "customStyle", "onCellClick", "showRowsSelected", "gridFooter", "advanceFilter", "closeDialog", "resetChildGrid", "selectedId", "refresh"],
   _excluded2 = ["row", "field", "id"];
 function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function _getRequireWildcardCache(e) { return e ? t : r; })(e); }
 function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != typeof e && "function" != typeof e) return { default: e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && Object.prototype.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n.default = e, t && t.set(e, n), n; }
@@ -205,7 +205,8 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
       advanceFilter,
       closeDialog,
       resetChildGrid,
-      selectedId
+      selectedId,
+      refresh
     } = _ref2,
     props = _objectWithoutProperties(_ref2, _excluded);
   const [paginationModel, setPaginationModel] = (0, _react.useState)({
@@ -657,7 +658,7 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
   (0, _react.useEffect)(() => {
     console.log("resetChildGrid in grid", resetChildGrid);
     fetchData();
-  }, [paginationModel, sortModel, filterModel, api, gridColumns, model, parentFilters, assigned, selected, available, advanceFilter]);
+  }, [paginationModel, sortModel, filterModel, api, gridColumns, model, parentFilters, assigned, selected, available, advanceFilter, refresh]);
 
   // useEffect(
   //     fetchData,

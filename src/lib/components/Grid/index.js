@@ -160,6 +160,7 @@ const GridBase = memo(({
     closeDialog,
     resetChildGrid,
     selectedId,
+    refresh,
     ...props
 }) => {
     const [paginationModel, setPaginationModel] = useState({ pageSize: defaultPageSize, page: 0 });
@@ -514,7 +515,7 @@ const GridBase = memo(({
     useEffect(() => {
         console.log("resetChildGrid in grid", resetChildGrid)
         fetchData();
-    }, [paginationModel, sortModel, filterModel, api, gridColumns, model, parentFilters, assigned, selected, available, advanceFilter]);
+    }, [paginationModel, sortModel, filterModel, api, gridColumns, model, parentFilters, assigned, selected, available, advanceFilter, refresh]);
 
     // useEffect(
     //     fetchData,
