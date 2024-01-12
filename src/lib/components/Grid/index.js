@@ -161,6 +161,7 @@ const GridBase = memo(({
     resetChildGrid,
     selectedId,
     refresh,
+    setClientSideSortData,
     ...props
 }) => {
     const [paginationModel, setPaginationModel] = useState({ pageSize: defaultPageSize, page: 0 });
@@ -515,6 +516,9 @@ const GridBase = memo(({
     useEffect(() => {
         console.log("resetChildGrid in grid", resetChildGrid)
         fetchData();
+        if (setClientSideSortData) {
+            setClientSideSortData(sortModel.map(sort => sort.field + ' ' + sort.sort).join(','));
+        }
     }, [paginationModel, sortModel, filterModel, api, gridColumns, model, parentFilters, assigned, selected, available, advanceFilter, refresh]);
 
     // useEffect(
