@@ -714,7 +714,7 @@ const GridBase = memo(({
                 anchorOrigin={{ horizontal: 'right', vertical: 'center' }}
             >
                 {(model.canEdit === undefined || model.canEdit) && <ActionMenuItem actionType={actionTypes.Edit} handler={() => handleMenuEdit(selectedRecord)}>Edit</ActionMenuItem>}
-                {!!model.openModLogModal && <ActionMenuItem actionType={actionTypes.Custom} handler={() => model.openModLogModal(selectedRecord)}>Show history</ActionMenuItem>}
+                {!!model.openModLogModal && <ActionMenuItem actionType={actionTypes.Custom} handler={() => model.openModLogModal(selectedRecord)}>Show Log History</ActionMenuItem>}
                 {(model.canDelete === undefined || model.canDelete) && <ActionMenuItem actionType={actionTypes.Delete} handler={() => handleMenuDelete(selectedRecord)}>Delete</ActionMenuItem>}
             </Menu>
         </div >
