@@ -888,7 +888,7 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
   }, "Edit"), !!model.openModLogModal && /*#__PURE__*/_react.default.createElement(ActionMenuItem, {
     actionType: actionTypes.Custom,
     handler: () => model.openModLogModal(selectedRecord)
-  }, "Show history"), (model.canDelete === undefined || model.canDelete) && /*#__PURE__*/_react.default.createElement(ActionMenuItem, {
+  }, "Show Log History"), (model.canDelete === undefined || model.canDelete) && /*#__PURE__*/_react.default.createElement(ActionMenuItem, {
     actionType: actionTypes.Delete,
     handler: () => handleMenuDelete(selectedRecord)
   }, "Delete")));
