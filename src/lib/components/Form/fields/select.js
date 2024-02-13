@@ -21,10 +21,13 @@ const Field = ({
 }) => {
     let options = lookups ? lookups[column?.lookup] : [];
     let inputValue;
-    if (column.valueParserForForm) {
-        inputValue = column.valueParserForForm(formik.values[field]);
-    } else {
-        inputValue = String(formik.values[field]);
+    console.log('24', formik.values[field]);
+    if (formik.values[field]) {
+        if (column.valueParserForForm) {
+            inputValue = column.valueParserForForm(formik.values[field]);
+        } else {
+            inputValue = String(formik.values[field]);
+        }
     }
     if (column.multiSelect) {
         if (!inputValue || inputValue.length === 0) {
