@@ -390,7 +390,7 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
       }
       pinnedColumns.right.push('actions');
     } else {
-      if (!model.noOptionButton && (model.canDelete === undefined || model.canDelete || model.canEdit === undefined || model.canEdit)) {
+      if (!model.noOptionButton && (model.canDelete === undefined || model.canDelete || model.canEdit === undefined || model.canEdit || model.openModLogModal)) {
         finalColumns.push({
           field: 'actions',
           width: 1,

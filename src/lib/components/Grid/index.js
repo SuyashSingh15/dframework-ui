@@ -298,8 +298,8 @@ const GridBase = memo(({
             if (
                 !model.noOptionButton &&
                 ((model.canDelete === undefined || model.canDelete) ||
-                    (model.canEdit === undefined || model.canEdit))
-            ) {
+                    (model.canEdit === undefined || model.canEdit) ||
+                    model.openModLogModal)) {
                 finalColumns.push({
                     field: 'actions',
                     width: 1,
