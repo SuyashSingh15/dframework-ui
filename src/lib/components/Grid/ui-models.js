@@ -43,7 +43,7 @@ class UiModel {
         const { columns } = this;
         let validationConfig = {};
         for (const column of columns) {
-            const { field, label, header, type = 'string', requiredIfNew = false, required = false, min = '', max = '', validationLength = 0, confirm = false, emailValidation = false } = column;
+            const { field, label, header, type = 'string', requiredIfNew = false, required = false, min = '', max = '', validationLength = 0, confirm = false, emailValidation = false, multiSelect } = column;
             const formLabel = label || header;
             if (!formLabel) {
                 continue;
@@ -89,11 +89,18 @@ class UiModel {
                     }).label(formLabel).required(`${formLabel} is required`);
                     break;
                 case 'select':
-                    config = yup.string().trim().label(formLabel).required(`${formLabel} is required`);
+                    console.log('select', column)
+
+                    if (multiSelect) {
+                        config = yup.array().label(formLabel).required(`Select at least one ${formLabel}`)
+                    } else {
+                        config = yup.string().trim().label(formLabel).required(`${formLabel} is required`);
+                    }
                     break;
                 case 'time':
                     config = yup.string().trim().label(formLabel).required(`${formLabel} is required`);
                     break;
+                // case 'multiselect':
                 case 'autocomplete':
                     config = yup.string().trim().label(formLabel).required(`Select at least one ${formLabel}`);
                     break;
@@ -101,7 +108,7 @@ class UiModel {
                     config = yup.mixed().label(formLabel);
                     break;
             }
-            if (required) {
+            if (!multiSelect && required) {
                 config = config.trim().required(`${formLabel} is required`);
             }
 

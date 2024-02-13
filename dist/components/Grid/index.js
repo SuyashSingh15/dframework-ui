@@ -308,7 +308,15 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
         overrides.field = column.field.replace(/s$/, 'Count');
       }
       if (gridColumnTypes[column.type]) {
-        Object.assign(overrides, gridColumnTypes[column.type]);
+        if (column.multiSelect) {
+          // Object.assign(overrides, gridColumnTypes[column.type]);
+          // "type": "singleSelect",
+          overrides.type = 'multipleSelect';
+          overrides.valueOptions = 'lookup';
+        } else {
+          Object.assign(overrides, gridColumnTypes[column.type]);
+        }
+        console.log("236", column, overrides);
       }
       if (overrides.valueOptions === "lookup") {
         overrides.valueOptions = lookupOptions;

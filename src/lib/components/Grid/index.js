@@ -232,7 +232,16 @@ const GridBase = memo(({
             }
 
             if (gridColumnTypes[column.type]) {
-                Object.assign(overrides, gridColumnTypes[column.type]);
+                if (column.multiSelect) {
+                    // Object.assign(overrides, gridColumnTypes[column.type]);
+                    // "type": "singleSelect",
+                    overrides.type = 'multipleSelect';
+                    overrides.valueOptions = 'lookup';
+                } else {
+                    Object.assign(overrides, gridColumnTypes[column.type]);
+                }
+                console.log("236", column, overrides)
+
             }
             if (overrides.valueOptions === "lookup") {
                 overrides.valueOptions = lookupOptions;

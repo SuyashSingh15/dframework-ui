@@ -131,7 +131,8 @@ class UiModel {
         max = '',
         validationLength = 0,
         confirm = false,
-        emailValidation = false
+        emailValidation = false,
+        multiSelect
       } = column;
       const formLabel = label || header;
       if (!formLabel) {
@@ -177,11 +178,17 @@ class UiModel {
           }).label(formLabel).required("".concat(formLabel, " is required"));
           break;
         case 'select':
-          config = yup.string().trim().label(formLabel).required("".concat(formLabel, " is required"));
+          console.log('select', column);
+          if (multiSelect) {
+            config = yup.array().label(formLabel).required("Select at least one ".concat(formLabel));
+          } else {
+            config = yup.string().trim().label(formLabel).required("".concat(formLabel, " is required"));
+          }
           break;
         case 'time':
           config = yup.string().trim().label(formLabel).required("".concat(formLabel, " is required"));
           break;
+        // case 'multiselect':
         case 'autocomplete':
           config = yup.string().trim().label(formLabel).required("Select at least one ".concat(formLabel));
           break;
@@ -189,7 +196,7 @@ class UiModel {
           config = yup.mixed().label(formLabel);
           break;
       }
-      if (required) {
+      if (!multiSelect && required) {
         config = config.trim().required("".concat(formLabel, " is required"));
       }
 

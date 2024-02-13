@@ -25,7 +25,12 @@ const Field = _ref => {
     lookups
   } = _ref;
   let options = lookups ? lookups[column === null || column === void 0 ? void 0 : column.lookup] : [];
-  let inputValue = String(formik.values[field]);
+  let inputValue;
+  if (column.valueParserForForm) {
+    inputValue = column.valueParserForForm(formik.values[field]);
+  } else {
+    inputValue = String(formik.values[field]);
+  }
   if (column.multiSelect) {
     if (!inputValue || inputValue.length === 0) {
       inputValue = [];
@@ -64,6 +69,7 @@ const Field = _ref => {
       readOnly: column.readOnly === true,
       value: inputValue,
       renderValue: selected => {
+        console.log('in select ', inputValue);
         if (Array.isArray(selected)) {
           return selected.map(value => {
             const option = options.find(option => option.value === value);
