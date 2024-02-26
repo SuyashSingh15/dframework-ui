@@ -21,13 +21,10 @@ const Field = ({
 }) => {
     let options = lookups ? lookups[column?.lookup] : [];
     let inputValue;
-    console.log('24', formik.values[field]);
-    if (formik.values[field]) {
-        if (column.valueParserForForm) {
-            inputValue = column.valueParserForForm(formik.values[field]);
-        } else {
-            inputValue = String(formik.values[field]);
-        }
+    if (column.valueParserForForm) {
+        inputValue = column.valueParserForForm(formik.values[field]);
+    } else {
+        inputValue = String(formik.values[field]);
     }
     if (column.multiSelect) {
         if (!inputValue || inputValue.length === 0) {
@@ -46,7 +43,6 @@ const Field = ({
                 (option) => option.HospitalId === selectedHospitalId
             );
         }
-
         return (
             <FormControl sx={{ marginRight: ".9rem" }} fullWidth key={field}>
                 <InputLabel
@@ -70,7 +66,6 @@ const Field = ({
                     readOnly={column.readOnly === true}
                     value={inputValue}
                     renderValue={(selected) => {
-                        console.log('in select ', inputValue)
                         if (Array.isArray(selected)) {
                             return selected
                                 .map((value) => {
@@ -82,7 +77,7 @@ const Field = ({
                                 .join(", ");
                         } else {
                             const selectedOption = options.find(
-                                (option) => option.value === Number(selected)
+                                (option) => option.value === parseInt(selected)
                             );
                             return selectedOption ? selectedOption.label : "Select";
                         }

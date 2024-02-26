@@ -26,13 +26,10 @@ const Field = _ref => {
   } = _ref;
   let options = lookups ? lookups[column === null || column === void 0 ? void 0 : column.lookup] : [];
   let inputValue;
-  console.log('24', formik.values[field]);
-  if (formik.values[field]) {
-    if (column.valueParserForForm) {
-      inputValue = column.valueParserForForm(formik.values[field]);
-    } else {
-      inputValue = String(formik.values[field]);
-    }
+  if (column.valueParserForForm) {
+    inputValue = column.valueParserForForm(formik.values[field]);
+  } else {
+    inputValue = String(formik.values[field]);
   }
   if (column.multiSelect) {
     if (!inputValue || inputValue.length === 0) {
@@ -43,6 +40,23 @@ const Field = _ref => {
       }
     }
   }
+  // if (formik.values[field]) {
+  //     if (column.valueParserForForm) {
+  //         inputValue = column.valueParserForForm(formik.values[field]);
+  //     } else {
+  //         inputValue = String(formik.values[field]);
+  //     }
+  // }
+  // if (column.multiSelect) {
+  //     if (!inputValue || inputValue.length === 0) {
+  //         inputValue = [];
+  //     } else {
+  //         if (!Array.isArray(inputValue)) {
+  //             inputValue = inputValue.split(",").map((e) => parseInt(e));
+  //         }
+  //     }
+  // }
+
   if (column.modifiedLabel) {
     if (field === "ActualRoomId" && formik.values.HospitalId) {
       const selectedHospitalId = formik.values.HospitalId;
@@ -72,14 +86,13 @@ const Field = _ref => {
       readOnly: column.readOnly === true,
       value: inputValue,
       renderValue: selected => {
-        console.log('in select ', inputValue);
         if (Array.isArray(selected)) {
           return selected.map(value => {
             const option = options.find(option => option.value === value);
             return option ? option.label : "Select";
           }).join(", ");
         } else {
-          const selectedOption = options.find(option => option.value === Number(selected));
+          const selectedOption = options.find(option => option.value === parseInt(selected));
           return selectedOption ? selectedOption.label : "Select";
         }
       },
