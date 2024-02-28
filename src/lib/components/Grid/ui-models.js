@@ -43,7 +43,7 @@ class UiModel {
         const { columns } = this;
         let validationConfig = {};
         for (const column of columns) {
-            const { field, label, header, type = 'string', requiredIfNew = false, required = false, min = '', max = '', validationLength = 0, confirm = false, emailValidation = false, multiSelect } = column;
+            const { field, label, header, type = 'string', requiredIfNew = false, required = false, min = '', max = '', validationLength = 0, multiSelect } = column;
             const formLabel = label || header;
             if (!formLabel) {
                 continue;
@@ -89,8 +89,6 @@ class UiModel {
                     }).label(formLabel).required(`${formLabel} is required`);
                     break;
                 case 'select':
-                    console.log('select', column)
-
                     if (multiSelect) {
                         config = yup.array().label(formLabel).required(`Select at least one ${formLabel}`)
                     } else {
@@ -100,7 +98,6 @@ class UiModel {
                 case 'time':
                     config = yup.string().trim().label(formLabel).required(`${formLabel} is required`);
                     break;
-                // case 'multiselect':
                 case 'autocomplete':
                     config = yup.string().trim().label(formLabel).required(`Select at least one ${formLabel}`);
                     break;
@@ -111,18 +108,9 @@ class UiModel {
             if (!multiSelect && required) {
                 config = config.trim().required(`${formLabel} is required`);
             }
-
-            // if (requiredIfNew && (!id || id === '')) {
-            //     config = config.trim().required(`${formLabel} is required`);
-            // }
-
-            // if (confirm) {
-            //     config = yup.string().oneOf([yup.ref('password')], 'Passwords must match').required('Confirm Password is required');
-            // }
-
-            // if (emailValidation) {
-            //     config = yup.string().email('Invalid email format').required(`${formLabel} is required`);
-            // }
+            if (requiredIfNew && (!id || id === '')) {
+                config = config.trim().required(`${formLabel} is required`);
+            }
             validationConfig[field] = config;
         }
 

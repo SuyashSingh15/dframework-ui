@@ -23,9 +23,8 @@ import Typography from '@mui/material/Typography';
 import MenuItem from '@mui/material/MenuItem';
 import { useSnackbar, DialogComponent } from '@durlabh/dfamework-ui';
 import Menu from '@mui/material/Menu';
-import { getList, getRecord, deleteRecord, saveRecord } from './crud-helper';
+import { getList, getRecord, deleteRecord } from './crud-helper';
 import PropTypes from 'prop-types';
-import dayjs from 'dayjs';
 import { Footer } from './footer';
 import { useRouter } from '../useRouter/useRouter'
 import template from './template'
@@ -42,7 +41,7 @@ const actionTypes = {
 };
 const constants = {
     gridFilterModel: { items: [], logicOperator: 'and', quickFilterValues: Array(0), quickFilterLogicOperator: 'and' },
-    permissions: { edit: true, add: true, export: false, delete: true, clearFilterText: "CLEAR THIS FILTER" },
+    permissions: { edit: true, add: true, export: true, delete: true, clearFilterText: "CLEAR THIS FILTER" },
 }
 
 const gridColumnTypes = {
@@ -195,7 +194,6 @@ const GridBase = memo(({
     const isReadOnly = model.readOnly === true;
     const dataRef = useRef(data);
     const [anchorEl, setAnchorEl] = React.useState(null);
-    const prevIsLoading = useRef(isLoading);
 
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
@@ -233,15 +231,11 @@ const GridBase = memo(({
 
             if (gridColumnTypes[column.type]) {
                 if (column.multiSelect) {
-                    // Object.assign(overrides, gridColumnTypes[column.type]);
-                    // "type": "singleSelect",
                     overrides.type = 'multipleSelect';
                     overrides.valueOptions = 'lookup';
                 } else {
                     Object.assign(overrides, gridColumnTypes[column.type]);
                 }
-                console.log("236", column, overrides)
-
             }
             if (overrides.valueOptions === "lookup") {
                 overrides.valueOptions = lookupOptions;
@@ -275,9 +269,9 @@ const GridBase = memo(({
         const showActions = model?.addHeaderFilters !== false;
         if (showActions && !forAssignment && !isReadOnly) {
             const actions = [];
-            // if (model.addEdit && permissions.edit) {
-            //     actions.push(<GridActionsCellItem icon={<EditIcon />} data-action={actionTypes.Edit} label="Edit" />);
-            // }
+            if (model.addEdit && permissions.edit) {
+                actions.push(<GridActionsCellItem icon={<EditIcon />} data-action={actionTypes.Edit} label="Edit" />);
+            }
             if (model.addCopy && permissions.add) {
                 actions.push(<GridActionsCellItem icon={<CopyIcon />} data-action={actionTypes.Copy} label="Copy" />);
             }
@@ -294,27 +288,18 @@ const GridBase = memo(({
                 });
             }
             pinnedColumns.right.push('actions');
-        } else {
-            if (
-                !model.noOptionButton &&
-                ((model.canDelete === undefined || model.canDelete) ||
-                    (model.canEdit === undefined || model.canEdit) ||
-                    model.openModLogModal)) {
-                finalColumns.push({
-                    field: 'actions',
-                    width: 1,
-                    headerName: '',
-                    renderCell: (cellParams) => (
-                        <>
-                            <MoreVertTwoToneIcon onClick={(event) => {
-                                setSelectedRecord(cellParams.row);
-                                handleClick(event);
-                            }} />
-                        </>
-                    ),
-                });
-            }
-
+        } else if (permissions.delete || permissions.edit || model.openModLogModal) {
+            finalColumns.push({
+                field: 'actions',
+                width: 1,
+                headerName: '',
+                renderCell: (cellParams) => (
+                    <MoreVertTwoToneIcon onClick={(event) => {
+                        setSelectedRecord(cellParams.row);
+                        handleClick(event);
+                    }} />
+                ),
+            });
         }
         return { gridColumns: finalColumns, pinnedColumns, lookupMap };
     }, [columns, model, parent, permissions, forAssignment]);
@@ -584,7 +569,6 @@ const GridBase = memo(({
             // return updatedRow;
             // console.log(props.processRowUpdate);
         }
-        console.log('row updated', updatedRow, data);
         // setIsLoading(false)
         // saveRecord({
         //     id: updatedRow[idProperty],
@@ -722,9 +706,9 @@ const GridBase = memo(({
                 transformOrigin={{ horizontal: 'right', vertical: 'center' }}
                 anchorOrigin={{ horizontal: 'right', vertical: 'center' }}
             >
-                {(model.canEdit === undefined || model.canEdit) && <ActionMenuItem actionType={actionTypes.Edit} handler={() => handleMenuEdit(selectedRecord)}>Edit</ActionMenuItem>}
+                {permissions.edit && <ActionMenuItem actionType={actionTypes.Edit} handler={() => handleMenuEdit(selectedRecord)}>Edit</ActionMenuItem>}
                 {!!model.openModLogModal && <ActionMenuItem actionType={actionTypes.Custom} handler={() => model.openModLogModal(selectedRecord)}>Show Log History</ActionMenuItem>}
-                {(model.canDelete === undefined || model.canDelete) && <ActionMenuItem actionType={actionTypes.Delete} handler={() => handleMenuDelete(selectedRecord)}>Delete</ActionMenuItem>}
+                {permissions.delete && <ActionMenuItem actionType={actionTypes.Delete} handler={() => handleMenuDelete(selectedRecord)}>Delete</ActionMenuItem>}
             </Menu>
         </div >
     );

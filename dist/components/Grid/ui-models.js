@@ -130,8 +130,6 @@ class UiModel {
         min = '',
         max = '',
         validationLength = 0,
-        confirm = false,
-        emailValidation = false,
         multiSelect
       } = column;
       const formLabel = label || header;
@@ -178,7 +176,6 @@ class UiModel {
           }).label(formLabel).required("".concat(formLabel, " is required"));
           break;
         case 'select':
-          console.log('select', column);
           if (multiSelect) {
             config = yup.array().label(formLabel).required("Select at least one ".concat(formLabel));
           } else {
@@ -188,7 +185,6 @@ class UiModel {
         case 'time':
           config = yup.string().trim().label(formLabel).required("".concat(formLabel, " is required"));
           break;
-        // case 'multiselect':
         case 'autocomplete':
           config = yup.string().trim().label(formLabel).required("Select at least one ".concat(formLabel));
           break;
@@ -199,18 +195,9 @@ class UiModel {
       if (!multiSelect && required) {
         config = config.trim().required("".concat(formLabel, " is required"));
       }
-
-      // if (requiredIfNew && (!id || id === '')) {
-      //     config = config.trim().required(`${formLabel} is required`);
-      // }
-
-      // if (confirm) {
-      //     config = yup.string().oneOf([yup.ref('password')], 'Passwords must match').required('Confirm Password is required');
-      // }
-
-      // if (emailValidation) {
-      //     config = yup.string().email('Invalid email format').required(`${formLabel} is required`);
-      // }
+      if (requiredIfNew && (!id || id === '')) {
+        config = config.trim().required("".concat(formLabel, " is required"));
+      }
       validationConfig[field] = config;
     }
     let validationSchema = yup.object(_objectSpread(_objectSpread({}, validationConfig), this.validationSchema));

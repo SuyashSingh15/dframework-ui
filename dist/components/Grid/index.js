@@ -36,7 +36,6 @@ var _dfameworkUi = require("@durlabh/dfamework-ui");
 var _Menu = _interopRequireDefault(require("@mui/material/Menu"));
 var _crudHelper = require("./crud-helper");
 var _propTypes = _interopRequireDefault(require("prop-types"));
-var _dayjs = _interopRequireDefault(require("dayjs"));
 var _footer = require("./footer");
 var _useRouter = require("../useRouter/useRouter");
 var _template = _interopRequireDefault(require("./template"));
@@ -71,7 +70,7 @@ const constants = {
   permissions: {
     edit: true,
     add: true,
-    export: false,
+    export: true,
     delete: true,
     clearFilterText: "CLEAR THIS FILTER"
   }
@@ -262,7 +261,6 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
   const isReadOnly = model.readOnly === true;
   const dataRef = (0, _react.useRef)(data);
   const [anchorEl, setAnchorEl] = _react.default.useState(null);
-  const prevIsLoading = (0, _react.useRef)(isLoading);
   const handleClick = event => {
     setAnchorEl(event.currentTarget);
   };
@@ -309,14 +307,11 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
       }
       if (gridColumnTypes[column.type]) {
         if (column.multiSelect) {
-          // Object.assign(overrides, gridColumnTypes[column.type]);
-          // "type": "singleSelect",
           overrides.type = 'multipleSelect';
           overrides.valueOptions = 'lookup';
         } else {
           Object.assign(overrides, gridColumnTypes[column.type]);
         }
-        console.log("236", column, overrides);
       }
       if (overrides.valueOptions === "lookup") {
         overrides.valueOptions = lookupOptions;
@@ -362,9 +357,13 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
     const showActions = (model === null || model === void 0 ? void 0 : model.addHeaderFilters) !== false;
     if (showActions && !forAssignment && !isReadOnly) {
       const actions = [];
-      // if (model.addEdit && permissions.edit) {
-      //     actions.push(<GridActionsCellItem icon={<EditIcon />} data-action={actionTypes.Edit} label="Edit" />);
-      // }
+      if (model.addEdit && permissions.edit) {
+        actions.push( /*#__PURE__*/_react.default.createElement(_xDataGridPremium.GridActionsCellItem, {
+          icon: /*#__PURE__*/_react.default.createElement(_Edit.default, null),
+          "data-action": actionTypes.Edit,
+          label: "Edit"
+        }));
+      }
       if (model.addCopy && permissions.add) {
         actions.push( /*#__PURE__*/_react.default.createElement(_xDataGridPremium.GridActionsCellItem, {
           icon: /*#__PURE__*/_react.default.createElement(_FileCopy.default, null),
@@ -389,20 +388,18 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
         });
       }
       pinnedColumns.right.push('actions');
-    } else {
-      if (!model.noOptionButton && (model.canDelete === undefined || model.canDelete || model.canEdit === undefined || model.canEdit || model.openModLogModal)) {
-        finalColumns.push({
-          field: 'actions',
-          width: 1,
-          headerName: '',
-          renderCell: cellParams => /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, /*#__PURE__*/_react.default.createElement(_MoreVertTwoTone.default, {
-            onClick: event => {
-              setSelectedRecord(cellParams.row);
-              handleClick(event);
-            }
-          }))
-        });
-      }
+    } else if (permissions.delete || permissions.edit || model.openModLogModal) {
+      finalColumns.push({
+        field: 'actions',
+        width: 1,
+        headerName: '',
+        renderCell: cellParams => /*#__PURE__*/_react.default.createElement(_MoreVertTwoTone.default, {
+          onClick: event => {
+            setSelectedRecord(cellParams.row);
+            handleClick(event);
+          }
+        })
+      });
     }
     return {
       gridColumns: finalColumns,
@@ -736,7 +733,6 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
       // return updatedRow;
       // console.log(props.processRowUpdate);
     }
-    console.log('row updated', updatedRow, data);
     // setIsLoading(false)
     // saveRecord({
     //     id: updatedRow[idProperty],
@@ -890,13 +886,13 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
       horizontal: 'right',
       vertical: 'center'
     }
-  }, (model.canEdit === undefined || model.canEdit) && /*#__PURE__*/_react.default.createElement(ActionMenuItem, {
+  }, permissions.edit && /*#__PURE__*/_react.default.createElement(ActionMenuItem, {
     actionType: actionTypes.Edit,
     handler: () => handleMenuEdit(selectedRecord)
   }, "Edit"), !!model.openModLogModal && /*#__PURE__*/_react.default.createElement(ActionMenuItem, {
     actionType: actionTypes.Custom,
     handler: () => model.openModLogModal(selectedRecord)
-  }, "Show Log History"), (model.canDelete === undefined || model.canDelete) && /*#__PURE__*/_react.default.createElement(ActionMenuItem, {
+  }, "Show Log History"), permissions.delete && /*#__PURE__*/_react.default.createElement(ActionMenuItem, {
     actionType: actionTypes.Delete,
     handler: () => handleMenuDelete(selectedRecord)
   }, "Delete")));

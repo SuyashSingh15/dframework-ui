@@ -40,23 +40,6 @@ const Field = _ref => {
       }
     }
   }
-  // if (formik.values[field]) {
-  //     if (column.valueParserForForm) {
-  //         inputValue = column.valueParserForForm(formik.values[field]);
-  //     } else {
-  //         inputValue = String(formik.values[field]);
-  //     }
-  // }
-  // if (column.multiSelect) {
-  //     if (!inputValue || inputValue.length === 0) {
-  //         inputValue = [];
-  //     } else {
-  //         if (!Array.isArray(inputValue)) {
-  //             inputValue = inputValue.split(",").map((e) => parseInt(e));
-  //         }
-  //     }
-  // }
-
   if (column.modifiedLabel) {
     if (field === "ActualRoomId" && formik.values.HospitalId) {
       const selectedHospitalId = formik.values.HospitalId;
