@@ -6,6 +6,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 require("core-js/modules/web.dom-collections.iterator.js");
+require("core-js/modules/es.array.includes.js");
+require("core-js/modules/es.string.includes.js");
 require("core-js/modules/es.parse-int.js");
 var _react = _interopRequireDefault(require("react"));
 var _material = require("@mui/material");
@@ -24,24 +26,39 @@ const Field = _ref => {
     onChange,
     lookups
   } = _ref;
-  let options = lookups ? lookups[column === null || column === void 0 ? void 0 : column.lookup] : [];
-  let inputValue;
-  if (column.valueParserForForm) {
-    inputValue = column.valueParserForForm(formik.values[field]);
-  } else {
-    inputValue = String(formik.values[field]);
-  }
-  if (column.multiSelect) {
-    if (!inputValue || inputValue.length === 0) {
-      inputValue = [];
-    } else if (!Array.isArray(inputValue)) {
-      inputValue = inputValue.split(",").map(e => parseInt(e));
+  const initialOptions = lookups ? lookups[column === null || column === void 0 ? void 0 : column.lookup] : [];
+  const [value, setValue] = _react.default.useState(formik.values[field]);
+  const [options, setOptions] = _react.default.useState(initialOptions);
+  _react.default.useEffect(() => {
+    var _column$dependentFiel;
+    let inputValue = formik.values[field],
+      newOptions = options;
+    if (((_column$dependentFiel = column.dependentField) === null || _column$dependentFiel === void 0 ? void 0 : _column$dependentFiel.operator) === "equals" && formik.values[column.dependentField.field] !== "") {
+      const selectedHospitalId = formik.values[column.dependentField.field];
+      newOptions = initialOptions.filter(option => option[column.dependentField.lookupFieldToBeComparedWith] === selectedHospitalId);
+      console.log(initialOptions, column.dependentField, formik.values, newOptions);
+      setOptions(newOptions);
     }
-  }
-  if (field === "ActualRoomId" && formik.values.HospitalId) {
-    const selectedHospitalId = formik.values.HospitalId;
-    options = options.filter(option => option.HospitalId === selectedHospitalId);
-  }
+    if (formik.values[field]) {
+      const val = formik.values[field];
+      if (!newOptions.includes(val)) {
+        setValue(null);
+        return;
+      }
+      if (column.valueParserForForm) {
+        inputValue = column.valueParserForForm(val);
+      } else {
+        inputValue = String(val);
+      }
+      if (column.multiSelect) {
+        if (!inputValue || inputValue.length === 0) {
+          inputValue = [];
+        } else if (!Array.isArray(inputValue)) {
+          inputValue = inputValue.split(",").map(e => parseInt(e));
+        }
+      }
+    }
+  }, [formik.values]);
   return /*#__PURE__*/_react.default.createElement(_material.FormControl, {
     fullWidth: true,
     key: field,
@@ -53,9 +70,10 @@ const Field = _ref => {
   }, otherProps, {
     error: formik.touched[field] && formik.errors[field],
     name: field,
+    disabled: !(options !== null && options !== void 0 && options.length),
     multiple: column.multiSelect === true,
     readOnly: column.readOnly === true,
-    value: inputValue,
+    value: value,
     renderValue: selected => {
       if (Array.isArray(selected)) {
         return selected.map(value => {

@@ -19,26 +19,41 @@ const Field = ({
     onChange,
     lookups,
 }) => {
-    let options = lookups ? lookups[column?.lookup] : [];
-    let inputValue;
-    if (column.valueParserForForm) {
-        inputValue = column.valueParserForForm(formik.values[field]);
-    } else {
-        inputValue = String(formik.values[field]);
-    }
-    if (column.multiSelect) {
-        if (!inputValue || inputValue.length === 0) {
-            inputValue = [];
-        } else if (!Array.isArray(inputValue)) {
-            inputValue = inputValue.split(",").map((e) => parseInt(e));
+    const initialOptions = lookups ? lookups[column?.lookup] : []
+
+    const [value, setValue] = React.useState(formik.values[field]);
+    const [options, setOptions] = React.useState(initialOptions)
+    React.useEffect(() => {
+        let inputValue = formik.values[field], newOptions = options;
+        if (column.dependentField?.operator === "equals" && formik.values[column.dependentField.field] !== "") {
+            const selectedHospitalId = formik.values[column.dependentField.field];
+            newOptions = initialOptions.filter(
+                (option) => option[column.dependentField.lookupFieldToBeComparedWith] === selectedHospitalId
+            );
+            console.log(initialOptions, column.dependentField, formik.values, newOptions)
+            setOptions(newOptions);
         }
-    }
-    if (field === "ActualRoomId" && formik.values.HospitalId) {
-        const selectedHospitalId = formik.values.HospitalId;
-        options = options.filter(
-            (option) => option.HospitalId === selectedHospitalId
-        );
-    }
+        if (formik.values[field]) {
+            const val = formik.values[field];
+            if (!newOptions.includes(val)) {
+                setValue(null);
+                return;
+            }
+            if (column.valueParserForForm) {
+                inputValue = column.valueParserForForm(val);
+            } else {
+                inputValue = String(val);
+            }
+            if (column.multiSelect) {
+                if (!inputValue || inputValue.length === 0) {
+                    inputValue = [];
+                } else if (!Array.isArray(inputValue)) {
+                    inputValue = inputValue.split(",").map((e) => parseInt(e));
+                }
+            }
+        }
+    }, [formik.values]);
+
     return (
         <FormControl fullWidth key={field} variant="standard">
             <InputLabel error={formik.touched[field] && formik.errors[field]}>{fieldLabel || column.label}</InputLabel>
@@ -47,9 +62,10 @@ const Field = ({
                 {...otherProps}
                 error={formik.touched[field] && formik.errors[field]}
                 name={field}
+                disabled={!options?.length}
                 multiple={column.multiSelect === true}
                 readOnly={column.readOnly === true}
-                value={inputValue}
+                value={value}
                 renderValue={(selected) => {
                     if (Array.isArray(selected)) {
                         return selected
