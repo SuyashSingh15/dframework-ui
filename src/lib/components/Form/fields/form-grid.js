@@ -22,7 +22,6 @@ const TransferField = ({ component, name, field, formik, type, model, ...props }
     return (
         <div>
             <Component selectedId={props.id} processRowUpdate={props.column?.processRowUpdate}
-            // resetChildGrid={props.column.resetChildGrid}
             />
         </div>
     )

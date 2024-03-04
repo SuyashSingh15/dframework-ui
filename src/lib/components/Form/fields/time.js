@@ -4,7 +4,6 @@ import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
-// import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -15,9 +14,9 @@ const Field = ({ column, field, fieldLabel, formik, otherProps, classes, onChang
   const [time, setTime] = useState(null);
 
   useEffect(() => {
-    // console.log(field, formik.values[field])
+    let dateTime;
     if (column?.dependentField?.operator === ">=" && formik.values[column.dependentField.field] !== "" && !formik.values[field]) {
-      const dateTime = dayjs(formik.values[column.dependentField.field]).add(5, 'minute');
+      dateTime = dayjs(formik.values[column.dependentField.field]).add(5, 'minute');
       if (dateTime.get("hour") > 12) {
         setTimePeriod("PM");
         updateFormikTime(time, "PM");
@@ -27,7 +26,15 @@ const Field = ({ column, field, fieldLabel, formik, otherProps, classes, onChang
       }
     }
     if (formik.values[field]) {
-      const dateTime = dayjs(formik.values[field]);
+      if (column.isUtc) {
+        dateTime = dayjs
+          .utc(formik.values[field])
+          .utcOffset(dayjs().utcOffset(), true)
+          .format();
+      }
+      else {
+        dateTime = dayjs(formik.values[field]);
+      }
       setTime(dateTime);
       setTimePeriod(dateTime.format("A"));
     }
@@ -39,11 +46,19 @@ const Field = ({ column, field, fieldLabel, formik, otherProps, classes, onChang
   };
 
   const handleTimeChange = (newTime) => {
-    // if (err) {
-    //   newTime = dayjs(formik.values[column.dependentField.field]).add(5, 'minute')
-    // }
-    setTime(newTime);
-    updateFormikTime(newTime, timePeriod);
+    if (column.modifiedLabel) {
+      setTime(newTime);
+      updateFormikTime(newTime, timePeriod);
+      return;
+    } else if (column.isUtc) {
+      newTime =
+        newTime?.isValid()
+          ? newTime.format("YYYY-MM-DDTHH:mm:ss") + ".000Z"
+          : null;
+    }
+    return formik.setFieldValue(field, newTime);
+
+
   };
   const updateFormikTime = (timeValue, period) => {
     if (timeValue) {
@@ -56,89 +71,33 @@ const Field = ({ column, field, fieldLabel, formik, otherProps, classes, onChang
       formik.setFieldValue(field, dateTime.toISOString());
     }
   };
-  // console.log('plugin', formik.values, formik.errors, formik.touched);
-  if (column.modifiedLabel) {
-    return (
-      <div
-        style={{ display: "flex", alignItems: "center", gap: '2.9rem', width: '337px !important' }}>
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <TimePicker style={{ flex: 2 }}
-            label={column.label}
-            value={time}
-            disabled={column.dependentField && formik.values[column.dependentField.field] === ""}
-            slotProps={{
-              textField: {
-                helperText: formik.touched[field] && formik.errors[field],
-                error: formik.touched[field] && formik.errors[field],
-                variant: "filled",
-                placeholder: "hh:mm"
-              },
-            }}
-            // ampm={false}
-            closeOnSelect={false}
-            minTime={column?.dependentField?.operator === ">=" && formik.values[column.dependentField.field] !== "" ? dayjs(formik.values[column.dependentField.field]).add(5, 'minute') : null}
-            onChange={handleTimeChange}
-            sx={{
-              backgroundColor: "#4F5883 !important",
-              "& .MuiOutlinedInput-input": {
-                padding: "1.65625rem 0.875rem 0.59375rem 0.875rem !important",
-              },
-              width: "200px",
-            }}
-            format="hh:mm"
-            views={["hours", "minutes"]}
-          />
-          <FormControl component="fieldset" style={{ flex: 1 }}>
-            <RadioGroup
-              value={timePeriod}
-              onChange={handleRadioChange}
-              style={{
-                flexDirection: "row",
-                flexWrap: "nowrap",
-              }}
-            >
-              <FormControlLabel
-                value="AM"
-                control={<Radio checked={timePeriod === "AM"} />}
-                label="AM"
-              />
-              <FormControlLabel
-                value="PM"
-                control={<Radio checked={timePeriod === "PM"} />}
-                label="PM"
-              />
-            </RadioGroup>
-          </FormControl>
-        </LocalizationProvider>
-      </div>
-    );
-  } else {
-    let inputValue = formik.values[field];
-    if (column.isUtc) {
-      inputValue = dayjs
-        .utc(inputValue)
-        .utcOffset(dayjs().utcOffset(), true)
-        .format();
-    }
-    return (
+  return (
+    <div
+      style={{ display: "flex", alignItems: "center", gap: '1rem' }}>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <TimePicker
           {...otherProps}
+          label={column.label || ""}
           variant="standard"
           readOnly={column?.readOnly === true}
           key={field}
           fullWidth
+          disabled={column.dependentField && formik.values[column.dependentField.field] === ""}
           name={field}
-          value={inputValue}
-          onChange={(value) => {
-            if (column.isUtc) {
-              value =
-                value && value.isValid()
-                  ? value.format("YYYY-MM-DDTHH:mm:ss") + ".000Z"
-                  : null;
-            }
-            return formik.setFieldValue(field, value);
+          value={time}
+          minTime={column?.dependentField?.operator === ">=" && formik.values[column.dependentField.field] !== "" ? dayjs(formik.values[column.dependentField.field]).add(4, 'minute') : null}
+          slotProps={{
+            textField: {
+              helperText: formik.touched[field] && formik.errors[field],
+              error: formik.touched[field] && formik.errors[field],
+              variant: "filled",
+              placeholder: "hh:mm"
+            },
           }}
+          closeOnSelect={!column.modifiedLabel}
+          format="hh:mm"
+          views={["hours", "minutes"]}
+          onChange={handleTimeChange}
           onBlur={formik.handleBlur}
           helperText={formik.touched[field] && formik.errors[field]}
           renderInput={(params) => {
@@ -152,9 +111,30 @@ const Field = ({ column, field, fieldLabel, formik, otherProps, classes, onChang
             );
           }}
         />
+        {column.modifiedLabel && <FormControl component="fieldset" >
+          <RadioGroup
+            value={timePeriod}
+            onChange={handleRadioChange}
+            style={{
+              flexDirection: "row",
+              flexWrap: "nowrap",
+            }}
+          >
+            <FormControlLabel
+              value="AM"
+              control={<Radio checked={timePeriod === "AM"} />}
+              label="AM"
+            />
+            <FormControlLabel
+              value="PM"
+              control={<Radio checked={timePeriod === "PM"} />}
+              label="PM"
+            />
+          </RadioGroup>
+        </FormControl>}
       </LocalizationProvider>
-    );
-  }
+    </div>
+  );
 };
 
 export default Field;

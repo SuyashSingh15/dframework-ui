@@ -127,7 +127,7 @@ const RenderSteps = ({ tabColumns, model, formik, data, onChange, combos, lookup
     )
 }
 
-const RenderColumns = ({ formElements, model, formik, data, onChange, combos, lookups, fieldConfigs, mode, id, resetChildGrid }) => {
+const RenderColumns = ({ formElements, model, formik, data, onChange, combos, lookups, fieldConfigs, mode, id }) => {
     const classes = useStyles();
     if (!formElements?.length) {
         return null;
@@ -145,7 +145,7 @@ const RenderColumns = ({ formElements, model, formik, data, onChange, combos, lo
                     : null
                 }
                 <Grid item xs={isGridComponent ? 12 : gridStyle} className={classes.childStyles}>
-                    <Component resetChildGrid={resetChildGrid} model={model} fieldConfigs={fieldConfigs[field]} column={column} mode={mode} field={field} fieldLabel={fieldLabel} formik={formik} data={data} onChange={onChange} combos={combos} lookups={lookups} id={id} {...otherProps} />
+                    <Component model={model} fieldConfigs={fieldConfigs[field]} column={column} mode={mode} field={field} fieldLabel={fieldLabel} formik={formik} data={data} onChange={onChange} combos={combos} lookups={lookups} id={id} {...otherProps} />
                 </Grid>
             </Grid >
         );
@@ -167,7 +167,7 @@ const RenderColumns = ({ formElements, model, formik, data, onChange, combos, lo
                     </Grid>
                 )}
             </Grid>
-            {gridComponents.length > 0 && (
+            {gridComponents?.length > 0 && (
                 <Grid container direction="column">
                     {gridComponents.map(renderFormElement)}
                 </Grid>
@@ -178,7 +178,6 @@ const RenderColumns = ({ formElements, model, formik, data, onChange, combos, lo
 
 
 const getFormConfig = function ({ columns, tabs = {}, id }) {
-    console.log(columns, id)
     const formElements = [], tabColumns = {};
     for (const tab in tabs) {
         tabColumns[tab] = [];

@@ -69,7 +69,6 @@ const Form = _ref => {
   const [validationSchema, setValidationSchema] = (0, _react.useState)(null);
   const [activeStep, setActiveStep] = (0, _react.useState)(0);
   const [isDiscardDialogOpen, setIsDiscardDialogOpen] = (0, _react.useState)(false);
-  const [deleteError, setDeleteError] = (0, _react.useState)(null);
   const [errorMessage, setErrorMessage] = (0, _react.useState)('');
   const fieldConfigs = model !== null && model !== void 0 && model.applyFieldConfig ? model === null || model === void 0 ? void 0 : model.applyFieldConfig({
     data,
@@ -91,7 +90,6 @@ const Form = _ref => {
       });
     } catch (error) {
       snackbar === null || snackbar === void 0 || snackbar.showMessage('An error occured, please try after some time.');
-      // navigate('./');
     }
   };
   (0, _react.useEffect)(getInitialData, [id, idWithOptions, model]);
@@ -124,7 +122,6 @@ const Form = _ref => {
             (0, _crudHelper.getList)();
           }
           snackbar === null || snackbar === void 0 || snackbar.showMessage('Record Updated Successfully.');
-          // navigate('./');
         }
       }).finally(() => setIsLoading(false));
     }
@@ -137,7 +134,6 @@ const Form = _ref => {
     dirty
   } = formik;
   const handleDiscardChanges = () => {
-    console.log("handle discrad", resetChildGrid);
     if (resetChildGrid) {
       getInitialData();
     } else {

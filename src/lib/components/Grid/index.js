@@ -132,6 +132,11 @@ const areEqual = (prevProps = {}, nextProps = {}) => {
     return equal;
 }
 
+const ActionMenuItem = ({ actionType, handler, children }) => (
+    <MenuItem className="actionMenuItem" data-action={actionType} onClick={handler}>
+        {children}
+    </MenuItem>
+);
 
 const GridBase = memo(({
     useLinkColumn = true,
@@ -313,7 +318,7 @@ const GridBase = memo(({
             extraParams["advanceFilter"] = advanceFilter;
         }
 
-        if (advanceFilter = [] && model.fetchId) {
+        if (advanceFilter?.length === 0 && model.fetchId) {
             advanceFilter = [{
                 field: "RoleId",
                 operator: "equals",
@@ -508,7 +513,6 @@ const GridBase = memo(({
     };
 
     useEffect(() => {
-        console.log("resetChildGrid in grid", resetChildGrid)
         fetchData();
         if (setClientSideSortData) {
             setClientSideSortData(sortModel.map(sort => sort.field + ' ' + sort.sort).join(','));
@@ -556,33 +560,10 @@ const GridBase = memo(({
         setRecord({ name: record[model?.linkColumn], id: record[idProperty] });
     };
 
-    const ActionMenuItem = ({ actionType, handler, children }) => (
-        <MenuItem className="actionMenuItem" data-action={actionType} onClick={handler}>
-            {children}
-        </MenuItem>
-    );
-
     const processRowUpdate = (updatedRow) => {
-        // setIsLoading(true);
         if (props.processRowUpdate) {
             props.processRowUpdate(updatedRow, data);
-            // return updatedRow;
-            // console.log(props.processRowUpdate);
         }
-        // setIsLoading(false)
-        // saveRecord({
-        //     id: updatedRow[idProperty],
-        //     api: api || model?.api,
-        //     values: updatedRow,
-        //     setIsLoading,
-        //     setError: snackbar?.showError
-        // })
-        //     .then(success => {
-        //         if (success) {
-        //             snackbar?.showMessage('Record Updated Successfully.');
-        //         }
-        //     })
-        //     .finally(() => setIsLoading(false));
         return updatedRow
     }
 

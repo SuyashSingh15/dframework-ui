@@ -218,8 +218,7 @@ const RenderColumns = _ref3 => {
     lookups,
     fieldConfigs,
     mode,
-    id,
-    resetChildGrid
+    id
   } = _ref3;
   const classes = useStyles();
   if (!(formElements !== null && formElements !== void 0 && formElements.length)) {
@@ -255,7 +254,6 @@ const RenderColumns = _ref3 => {
       xs: isGridComponent ? 12 : gridStyle,
       className: classes.childStyles
     }, /*#__PURE__*/React.createElement(Component, _extends({
-      resetChildGrid: resetChildGrid,
       model: model,
       fieldConfigs: fieldConfigs[field],
       column: column,
@@ -282,7 +280,7 @@ const RenderColumns = _ref3 => {
   }, nonGridComponents.slice(0, splitPoint).map(renderFormElement)), !model.addHeaderFilters && /*#__PURE__*/React.createElement(_Grid.default, {
     item: true,
     xs: 6
-  }, nonGridComponents.slice(splitPoint).map(renderFormElement))), gridComponents.length > 0 && /*#__PURE__*/React.createElement(_Grid.default, {
+  }, nonGridComponents.slice(splitPoint).map(renderFormElement))), (gridComponents === null || gridComponents === void 0 ? void 0 : gridComponents.length) > 0 && /*#__PURE__*/React.createElement(_Grid.default, {
     container: true,
     direction: "column"
   }, gridComponents.map(renderFormElement)));
@@ -293,7 +291,6 @@ const getFormConfig = function getFormConfig(_ref4) {
     tabs = {},
     id
   } = _ref4;
-  console.log(columns, id);
   const formElements = [],
     tabColumns = {};
   for (const tab in tabs) {

@@ -66,9 +66,14 @@ class UiModel {
       }, props)));
     });
     _defineProperty(this, "ChildGrid", props => {
+      const {
+        permissions
+      } = this;
+      const propsToBePassed = _objectSpread({}, props);
+      if (permissions) propsToBePassed.permissions = permissions;
       return /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, /*#__PURE__*/_react.default.createElement(_index.default, _extends({
         model: this
-      }, props, {
+      }, propsToBePassed, {
         customStyle: customStyle,
         showRowsSelected: showRowsSelected
       })), /*#__PURE__*/_react.default.createElement(_material.Divider, {

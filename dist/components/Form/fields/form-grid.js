@@ -47,7 +47,6 @@ const TransferField = _ref => {
   return /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement(Component, {
     selectedId: props.id,
     processRowUpdate: (_props$column = props.column) === null || _props$column === void 0 ? void 0 : _props$column.processRowUpdate
-    // resetChildGrid={props.column.resetChildGrid}
   }));
 };
 var _default = exports.default = TransferField;

@@ -126,8 +126,11 @@ class UiModel {
         return <Paper><GridBase model={this} showRowsSelected={showRowsSelected} {...props} /></Paper>
     }
     ChildGrid = (props) => {
+        const { permissions } = this;
+        const propsToBePassed = { ...props };
+        if (permissions) propsToBePassed.permissions = permissions;
         return <>
-            <GridBase model={this} {...props} customStyle={customStyle} showRowsSelected={showRowsSelected} />
+            <GridBase model={this} {...propsToBePassed} customStyle={customStyle} showRowsSelected={showRowsSelected} />
             <Divider orientation='horizontal' sx={{ mt: 2 }} />
         </>
     }

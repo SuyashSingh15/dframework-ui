@@ -37,7 +37,6 @@ const Form = ({
     const [validationSchema, setValidationSchema] = useState(null);
     const [activeStep, setActiveStep] = useState(0);
     const [isDiscardDialogOpen, setIsDiscardDialogOpen] = useState(false);
-    const [deleteError, setDeleteError] = useState(null);
     const [errorMessage, setErrorMessage] = useState('');
     const fieldConfigs = model?.applyFieldConfig ? model?.applyFieldConfig({ data, lookups }) : defaultFieldConfigs;
 
@@ -54,7 +53,6 @@ const Form = ({
             })
         } catch (error) {
             snackbar?.showMessage('An error occured, please try after some time.');
-            // navigate('./');
         }
     }
     useEffect(getInitialData, [id, idWithOptions, model]);
@@ -85,7 +83,6 @@ const Form = ({
                             getList();
                         }
                         snackbar?.showMessage('Record Updated Successfully.');
-                        // navigate('./');
                     }
                 })
                 .finally(() => setIsLoading(false));
@@ -100,7 +97,6 @@ const Form = ({
     const { dirty } = formik;
 
     const handleDiscardChanges = () => {
-        console.log("handle discrad", resetChildGrid)
         if (resetChildGrid) {
             getInitialData();
         }

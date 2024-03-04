@@ -179,7 +179,19 @@ const areEqual = function areEqual() {
   }
   return equal;
 };
-const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
+const ActionMenuItem = _ref2 => {
+  let {
+    actionType,
+    handler,
+    children
+  } = _ref2;
+  return /*#__PURE__*/_react.default.createElement(_MenuItem.default, {
+    className: "actionMenuItem",
+    "data-action": actionType,
+    onClick: handler
+  }, children);
+};
+const GridBase = /*#__PURE__*/(0, _react.memo)(_ref3 => {
   let {
       useLinkColumn = true,
       model,
@@ -208,8 +220,8 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
       selectedId,
       refresh,
       setClientSideSortData
-    } = _ref2,
-    props = _objectWithoutProperties(_ref2, _excluded);
+    } = _ref3,
+    props = _objectWithoutProperties(_ref3, _excluded);
   const [paginationModel, setPaginationModel] = (0, _react.useState)({
     pageSize: defaultPageSize,
     page: 0
@@ -268,13 +280,13 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
   (0, _react.useEffect)(() => {
     dataRef.current = data;
   }, [data]);
-  const lookupOptions = _ref3 => {
+  const lookupOptions = _ref4 => {
     let {
         row,
         field,
         id
-      } = _ref3,
-      others = _objectWithoutProperties(_ref3, _excluded2);
+      } = _ref4,
+      others = _objectWithoutProperties(_ref4, _excluded2);
     const lookupData = dataRef.current.lookups || {};
     return lookupData[lookupMap[field].lookup] || [];
   };
@@ -408,6 +420,7 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
     };
   }, [columns, model, parent, permissions, forAssignment]);
   const fetchData = function fetchData() {
+    var _advanceFilter;
     let action = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "list";
     let extraParams = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
     let contentType = arguments.length > 2 ? arguments[2] : undefined;
@@ -422,7 +435,7 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
     if (advanceFilter) {
       extraParams["advanceFilter"] = advanceFilter;
     }
-    if (advanceFilter = [] && model.fetchId) {
+    if (((_advanceFilter = advanceFilter) === null || _advanceFilter === void 0 ? void 0 : _advanceFilter.length) === 0 && model.fetchId) {
       advanceFilter = [{
         field: "RoleId",
         operator: "equals",
@@ -579,11 +592,11 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
   const clearFilters = () => {
     setFilterModel(constants.gridFilterModel);
   };
-  const updateAssignment = _ref4 => {
+  const updateAssignment = _ref5 => {
     let {
       unassign,
       assign
-    } = _ref4;
+    } = _ref5;
     const assignedValues = Array.isArray(selected) ? selected : selected.length ? selected.split(',') : [];
     const finalValues = unassign ? assignedValues.filter(id => !unassign.includes(parseInt(id))) : [...assignedValues, ...assign];
     onAssignChange(typeof selected === 'string' ? finalValues.join(',') : finalValues);
@@ -663,7 +676,6 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
     fetchData(undefined, undefined, e.target.dataset.contentType, columns);
   };
   (0, _react.useEffect)(() => {
-    console.log("resetChildGrid in grid", resetChildGrid);
     fetchData();
     if (setClientSideSortData) {
       setClientSideSortData(sortModel.map(sort => sort.field + ' ' + sort.sort).join(','));
@@ -714,39 +726,10 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref2 => {
       id: record[idProperty]
     });
   };
-  const ActionMenuItem = _ref5 => {
-    let {
-      actionType,
-      handler,
-      children
-    } = _ref5;
-    return /*#__PURE__*/_react.default.createElement(_MenuItem.default, {
-      className: "actionMenuItem",
-      "data-action": actionType,
-      onClick: handler
-    }, children);
-  };
   const processRowUpdate = updatedRow => {
-    // setIsLoading(true);
     if (props.processRowUpdate) {
       props.processRowUpdate(updatedRow, data);
-      // return updatedRow;
-      // console.log(props.processRowUpdate);
     }
-    // setIsLoading(false)
-    // saveRecord({
-    //     id: updatedRow[idProperty],
-    //     api: api || model?.api,
-    //     values: updatedRow,
-    //     setIsLoading,
-    //     setError: snackbar?.showError
-    // })
-    //     .then(success => {
-    //         if (success) {
-    //             snackbar?.showMessage('Record Updated Successfully.');
-    //         }
-    //     })
-    //     .finally(() => setIsLoading(false));
     return updatedRow;
   };
   return /*#__PURE__*/_react.default.createElement("div", {
