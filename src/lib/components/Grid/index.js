@@ -318,7 +318,7 @@ const GridBase = memo(({
             extraParams["advanceFilter"] = advanceFilter;
         }
 
-        if (advanceFilter?.length === 0 && model.fetchId) {
+        if (model.fetchId) {
             advanceFilter = [{
                 field: "RoleId",
                 operator: "equals",

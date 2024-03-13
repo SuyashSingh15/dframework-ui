@@ -29,8 +29,6 @@ const Field = _ref => {
   if (((_column$dependentFiel = column.dependentField) === null || _column$dependentFiel === void 0 ? void 0 : _column$dependentFiel.operator) === "equals" && formik.values[column.dependentField.field] !== "") {
     const selectedHospitalId = formik.values[column.dependentField.field];
     options = options.filter(option => option[column.dependentField.lookupFieldToBeComparedWith] === selectedHospitalId);
-    // console.log(initialOptions, column.dependentField, formik.values, newOptions)
-    // setOptions(newOptions);
   }
   let inputValue;
   if (column.valueParserForForm) {
@@ -45,12 +43,6 @@ const Field = _ref => {
       inputValue = inputValue.split(",").map(e => parseInt(e));
     }
   }
-  // if (field === "ActualRoomId" && formik.values.HospitalId) {
-  //     const selectedHospitalId = formik.values.HospitalId;
-  //     options = options.filter(
-  //         (option) => option.HospitalId === selectedHospitalId
-  //     );
-  // }
   return /*#__PURE__*/_react.default.createElement(_material.FormControl, {
     fullWidth: true,
     key: field,
@@ -62,7 +54,7 @@ const Field = _ref => {
   }, otherProps, {
     error: formik.touched[field] && formik.errors[field],
     name: field,
-    disabled: ((_column$dependentFiel2 = column.dependentField) === null || _column$dependentFiel2 === void 0 ? void 0 : _column$dependentFiel2.field) && !formik.values[column.dependentField.field],
+    disabled: ((_column$dependentFiel2 = column.dependentField) === null || _column$dependentFiel2 === void 0 ? void 0 : _column$dependentFiel2.field) && !formik.values[column.dependentField.field] || !options.length,
     multiple: column.multiSelect === true,
     readOnly: column.readOnly === true,
     value: inputValue,

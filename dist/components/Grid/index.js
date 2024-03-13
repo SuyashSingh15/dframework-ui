@@ -420,7 +420,6 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref3 => {
     };
   }, [columns, model, parent, permissions, forAssignment]);
   const fetchData = function fetchData() {
-    var _advanceFilter;
     let action = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "list";
     let extraParams = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
     let contentType = arguments.length > 2 ? arguments[2] : undefined;
@@ -435,7 +434,7 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref3 => {
     if (advanceFilter) {
       extraParams["advanceFilter"] = advanceFilter;
     }
-    if (((_advanceFilter = advanceFilter) === null || _advanceFilter === void 0 ? void 0 : _advanceFilter.length) === 0 && model.fetchId) {
+    if (model.fetchId) {
       advanceFilter = [{
         field: "RoleId",
         operator: "equals",
