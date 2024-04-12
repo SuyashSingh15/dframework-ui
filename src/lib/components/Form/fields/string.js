@@ -30,7 +30,8 @@ const Field = ({ column, field, fieldLabel, formik, otherProps, classes, onChang
                 }}
                 InputProps={{
                     readOnly: column?.readOnly === true,
-                    disableUnderline: true
+                    disableUnderline: true,
+                    maxLength: 5
                 }}
                 sx={{ backgroundColor: ' #4F5883 !important' }}
                 {...commonProps}
