@@ -40,33 +40,26 @@ const Field = _ref => {
   }, otherProps), {}, {
     autoFocus: !!column.autoFocus
   });
-  if (column.modifiedLabel) {
-    return /*#__PURE__*/_react.default.createElement(_TextField.default, _extends({
-      id: "filled-basic",
-      variant: "filled",
-      placeholder: "Enter",
-      label: column.label,
-      fullWidth: true,
-      InputLabelProps: {
-        shrink: true
-      },
-      InputProps: {
-        readOnly: (column === null || column === void 0 ? void 0 : column.readOnly) === true,
-        disableUnderline: true,
-        maxLength: 5
-      },
-      sx: {
-        backgroundColor: ' #4F5883 !important'
-      }
-    }, commonProps));
-  } else {
-    return /*#__PURE__*/_react.default.createElement(_TextField.default, _extends({
-      variant: "standard",
-      fullWidth: true,
-      InputProps: {
-        readOnly: (column === null || column === void 0 ? void 0 : column.readOnly) === true
-      }
-    }, commonProps));
+  if (column.maxLength) {
+    commonProps.inputProps = {
+      maxLength: column.maxLength
+    };
   }
+  return /*#__PURE__*/_react.default.createElement(_TextField.default, _extends({
+    variant: column.variant || "filled",
+    placeholder: "Enter",
+    label: column.label,
+    fullWidth: true,
+    InputLabelProps: {
+      shrink: true
+    },
+    InputProps: {
+      readOnly: (column === null || column === void 0 ? void 0 : column.readOnly) === true,
+      disableUnderline: true
+    },
+    sx: {
+      backgroundColor: ' #4F5883 !important'
+    }
+  }, commonProps));
 };
 var _default = exports.default = Field;

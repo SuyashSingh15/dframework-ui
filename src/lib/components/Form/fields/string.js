@@ -2,7 +2,6 @@ import React from 'react';
 import TextField from '@mui/material/TextField';
 
 const Field = ({ column, field, fieldLabel, formik, otherProps, classes, onChange }) => {
-
     const commonProps = {
         type: "text",
         key: field,
@@ -16,39 +15,28 @@ const Field = ({ column, field, fieldLabel, formik, otherProps, classes, onChang
         ...otherProps,
         autoFocus: !!column.autoFocus
     };
-
-    if (column.modifiedLabel) {
-        return (
-            <TextField
-                id="filled-basic"
-                variant="filled"
-                placeholder="Enter"
-                label={column.label}
-                fullWidth
-                InputLabelProps={{
-                    shrink: true,
-                }}
-                InputProps={{
-                    readOnly: column?.readOnly === true,
-                    disableUnderline: true,
-                    maxLength: 5
-                }}
-                sx={{ backgroundColor: ' #4F5883 !important' }}
-                {...commonProps}
-            />
-        );
-    } else {
-        return (
-            <TextField
-                variant="standard"
-                fullWidth
-                InputProps={{
-                    readOnly: column?.readOnly === true
-                }}
-                {...commonProps}
-            />
-        );
+    if (column.maxLength) {
+        commonProps.inputProps = {
+            maxLength: column.maxLength
+        }
     }
+    return (
+        <TextField
+            variant={column.variant || "filled"}
+            placeholder="Enter"
+            label={column.label}
+            fullWidth
+            InputLabelProps={{
+                shrink: true,
+            }}
+            InputProps={{
+                readOnly: column?.readOnly === true,
+                disableUnderline: true
+            }}
+            sx={{ backgroundColor: ' #4F5883 !important' }}
+            {...commonProps}
+        />
+    );
 };
 
 export default Field;
