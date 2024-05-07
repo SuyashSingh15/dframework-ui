@@ -69,7 +69,7 @@ const Field = _ref => {
     updateFormikTime(time, event.target.value);
   };
   const handleTimeChange = newTime => {
-    if (column.modifiedLabel) {
+    if (column.showExternalControls) {
       setTime(newTime);
       updateFormikTime(newTime, timePeriod);
       return;
@@ -115,7 +115,7 @@ const Field = _ref => {
         placeholder: "hh:mm"
       }
     },
-    closeOnSelect: !column.modifiedLabel,
+    closeOnSelect: column.closeOnSelect,
     format: "hh:mm",
     views: ["hours", "minutes"],
     onChange: handleTimeChange,
@@ -130,7 +130,7 @@ const Field = _ref => {
         fullWidth: true
       }));
     }
-  })), column.modifiedLabel && /*#__PURE__*/_react.default.createElement(_FormControl.default, {
+  })), column.showExternalControls && /*#__PURE__*/_react.default.createElement(_FormControl.default, {
     component: "fieldset"
   }, /*#__PURE__*/_react.default.createElement(_RadioGroup.default, {
     value: timePeriod,

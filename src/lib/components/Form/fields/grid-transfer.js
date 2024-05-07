@@ -32,20 +32,10 @@ const TransferField = ({
 
     return (
         <div>
-            {props.column.modifiedLabel ? (
-                <Component
-                    selected={value}
-                    onAssignChange={onAssignChange}
-                    {...props} 
-                />
-            ) : (
-                <>
-                    <div className={`${classes.divSpacing} ${classes.boldText}`}>Available</div>
-                    <Component selected={value} available={true} onAssignChange={onAssignChange} />
-                    <div className={`${classes.divSpacing} ${classes.boldText}`}>Assigned</div>
-                    <Component selected={value} assigned={true} onAssignChange={onAssignChange} />
-                </>
-            )}
+            <div className={`${classes.divSpacing} ${classes.boldText}`}>Available</div>
+            <Component selected={value} available={true} onAssignChange={onAssignChange} />
+            <div className={`${classes.divSpacing} ${classes.boldText}`}>Assigned</div>
+            <Component selected={value} assigned={true} onAssignChange={onAssignChange} />
         </div>
     );
 }

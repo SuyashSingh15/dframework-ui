@@ -12,7 +12,7 @@ const Field = ({ column, field, fieldLabel, formik, otherProps, classes, fieldCo
 
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-            {column.modifiedLabel && <InputLabel sx={{
+            {column.label && <InputLabel sx={{
                 margin: '0.9rem 2rem 2.5rem 0rem',
                 position: 'absolute', zIndex: '1', transform: 'translate(14px, -9px) scale(0.75)',
                 color: formik.touched[field] && formik.errors[field] ? "#f44336" : "inherit"

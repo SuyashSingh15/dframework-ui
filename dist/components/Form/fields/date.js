@@ -37,7 +37,7 @@ const Field = _ref => {
   const dateValue = formik.values[field] ? (0, _dayjs.default)(formik.values[field]) : null;
   return /*#__PURE__*/_react.default.createElement(_LocalizationProvider.LocalizationProvider, {
     dateAdapter: _AdapterDayjs.AdapterDayjs
-  }, column.modifiedLabel && /*#__PURE__*/_react.default.createElement(_material.InputLabel, {
+  }, column.label && /*#__PURE__*/_react.default.createElement(_material.InputLabel, {
     sx: {
       margin: '0.9rem 2rem 2.5rem 0rem',
       position: 'absolute',

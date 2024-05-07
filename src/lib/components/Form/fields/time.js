@@ -46,7 +46,7 @@ const Field = ({ column, field, fieldLabel, formik, otherProps, classes, onChang
   };
 
   const handleTimeChange = (newTime) => {
-    if (column.modifiedLabel) {
+    if (column.showExternalControls) {
       setTime(newTime);
       updateFormikTime(newTime, timePeriod);
       return;
@@ -94,7 +94,7 @@ const Field = ({ column, field, fieldLabel, formik, otherProps, classes, onChang
               placeholder: "hh:mm"
             },
           }}
-          closeOnSelect={!column.modifiedLabel}
+          closeOnSelect={column.closeOnSelect}
           format="hh:mm"
           views={["hours", "minutes"]}
           onChange={handleTimeChange}
@@ -111,7 +111,7 @@ const Field = ({ column, field, fieldLabel, formik, otherProps, classes, onChang
             );
           }}
         />
-        {column.modifiedLabel && <FormControl component="fieldset" >
+        {column.showExternalControls && <FormControl component="fieldset" >
           <RadioGroup
             value={timePeriod}
             onChange={handleRadioChange}
