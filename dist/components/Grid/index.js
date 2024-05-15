@@ -403,6 +403,7 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref3 => {
       finalColumns.push({
         field: 'actions',
         width: 1,
+        sortable: false,
         headerName: '',
         renderCell: cellParams => /*#__PURE__*/_react.default.createElement(_MoreVertTwoTone.default, {
           onClick: event => {

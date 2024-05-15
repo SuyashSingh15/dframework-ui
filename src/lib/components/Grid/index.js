@@ -297,6 +297,7 @@ const GridBase = memo(({
             finalColumns.push({
                 field: 'actions',
                 width: 1,
+                sortable: false,
                 headerName: '',
                 renderCell: (cellParams) => (
                     <MoreVertTwoToneIcon onClick={(event) => {
