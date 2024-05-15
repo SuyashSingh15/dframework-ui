@@ -43,13 +43,16 @@ const Field = _ref => {
       inputValue = inputValue.split(",").map(e => parseInt(e));
     }
   }
+  fieldLabel = fieldLabel || column.label;
+  console.log(fieldLabel, column);
+  fieldLabel += column.required ? " *" : "";
   return /*#__PURE__*/_react.default.createElement(_material.FormControl, {
     fullWidth: true,
     key: field,
     variant: "standard"
   }, /*#__PURE__*/_react.default.createElement(_material.InputLabel, {
     error: formik.touched[field] && formik.errors[field]
-  }, fieldLabel || column.label), /*#__PURE__*/_react.default.createElement(_material.Select, _extends({
+  }, fieldLabel), /*#__PURE__*/_react.default.createElement(_material.Select, _extends({
     IconComponent: _KeyboardArrowDown.default
   }, otherProps, {
     error: formik.touched[field] && formik.errors[field],

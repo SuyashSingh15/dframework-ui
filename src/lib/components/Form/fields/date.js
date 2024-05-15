@@ -10,13 +10,15 @@ const Field = ({ column, field, fieldLabel, formik, otherProps, classes, fieldCo
     const isDisabled = (fieldConfigs?.disabled) || (column.dependentField && formik.values[column.dependentField.field] === "");
     const dateValue = formik.values[field] ? dayjs(formik.values[field]) : null;
 
+    fieldLabel = fieldLabel || column.label;
+    fieldLabel += column.required ? " *" : "";
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-            {column.label && <InputLabel sx={{
+            {fieldLabel && <InputLabel sx={{
                 margin: '0.9rem 2rem 2.5rem 0rem',
                 position: 'absolute', zIndex: '1', transform: 'translate(14px, -9px) scale(0.75)',
                 color: formik.touched[field] && formik.errors[field] ? "#f44336" : "inherit"
-            }}>{column.label}</InputLabel>}
+            }}>{fieldLabel}</InputLabel>}
             <DatePicker
                 {...otherProps}
                 variant="standard"

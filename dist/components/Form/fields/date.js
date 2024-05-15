@@ -35,9 +35,11 @@ const Field = _ref => {
   } = _ref;
   const isDisabled = (fieldConfigs === null || fieldConfigs === void 0 ? void 0 : fieldConfigs.disabled) || column.dependentField && formik.values[column.dependentField.field] === "";
   const dateValue = formik.values[field] ? (0, _dayjs.default)(formik.values[field]) : null;
+  fieldLabel = fieldLabel || column.label;
+  fieldLabel += column.required ? " *" : "";
   return /*#__PURE__*/_react.default.createElement(_LocalizationProvider.LocalizationProvider, {
     dateAdapter: _AdapterDayjs.AdapterDayjs
-  }, column.label && /*#__PURE__*/_react.default.createElement(_material.InputLabel, {
+  }, fieldLabel && /*#__PURE__*/_react.default.createElement(_material.InputLabel, {
     sx: {
       margin: '0.9rem 2rem 2.5rem 0rem',
       position: 'absolute',
@@ -45,7 +47,7 @@ const Field = _ref => {
       transform: 'translate(14px, -9px) scale(0.75)',
       color: formik.touched[field] && formik.errors[field] ? "#f44336" : "inherit"
     }
-  }, column.label), /*#__PURE__*/_react.default.createElement(_DatePicker.DatePicker, _extends({}, otherProps, {
+  }, fieldLabel), /*#__PURE__*/_react.default.createElement(_DatePicker.DatePicker, _extends({}, otherProps, {
     variant: "standard",
     minDate: (column === null || column === void 0 || (_column$dependentFiel = column.dependentField) === null || _column$dependentFiel === void 0 ? void 0 : _column$dependentFiel.operator) === ">=" && formik.values[column.dependentField.field] !== "" ? (0, _dayjs.default)(formik.values[column.dependentField.field]) : null,
     readOnly: (column === null || column === void 0 ? void 0 : column.readOnly) === true,

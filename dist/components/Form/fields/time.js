@@ -89,6 +89,8 @@ const Field = _ref => {
       formik.setFieldValue(field, dateTime.toISOString());
     }
   };
+  fieldLabel = fieldLabel || column.label;
+  fieldLabel += column.required ? " *" : "";
   return /*#__PURE__*/_react.default.createElement("div", {
     style: {
       display: "flex",
@@ -98,7 +100,7 @@ const Field = _ref => {
   }, /*#__PURE__*/_react.default.createElement(_LocalizationProvider.LocalizationProvider, {
     dateAdapter: _AdapterDayjs.AdapterDayjs
   }, /*#__PURE__*/_react.default.createElement(_TimePicker.TimePicker, _extends({}, otherProps, {
-    label: column.label || "",
+    label: fieldLabel,
     variant: "standard",
     readOnly: (column === null || column === void 0 ? void 0 : column.readOnly) === true,
     key: field,

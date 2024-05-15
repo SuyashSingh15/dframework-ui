@@ -39,9 +39,12 @@ const Field = ({
             inputValue = inputValue.split(",").map((e) => parseInt(e));
         }
     }
+    fieldLabel = fieldLabel || column.label;
+    console.log(fieldLabel, column);
+    fieldLabel += column.required ? " *" : "";
     return (
         <FormControl fullWidth key={field} variant="standard">
-            <InputLabel error={formik.touched[field] && formik.errors[field]}>{fieldLabel || column.label}</InputLabel>
+            <InputLabel error={formik.touched[field] && formik.errors[field]}>{fieldLabel}</InputLabel>
             <Select
                 IconComponent={KeyboardArrowDownIcon}
                 {...otherProps}

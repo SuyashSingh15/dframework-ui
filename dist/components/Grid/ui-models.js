@@ -197,10 +197,10 @@ class UiModel {
           break;
       }
       if (!multiSelect && required) {
-        config = config.trim().required("".concat(formLabel, " is required"));
+        config = config.required("".concat(formLabel, " is required"));
       }
       if (requiredIfNew && (!id || id === '')) {
-        config = config.trim().required("".concat(formLabel, " is required"));
+        config = config.required("".concat(formLabel, " is required"));
       }
       validationConfig[field] = config;
     }

@@ -71,13 +71,15 @@ const Field = ({ column, field, fieldLabel, formik, otherProps, classes, onChang
       formik.setFieldValue(field, dateTime.toISOString());
     }
   };
+  fieldLabel = fieldLabel || column.label;
+  fieldLabel += column.required ? " *" : "";
   return (
     <div
       style={{ display: "flex", alignItems: "center", gap: '1rem' }}>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <TimePicker
           {...otherProps}
-          label={column.label || ""}
+          label={fieldLabel}
           variant="standard"
           readOnly={column?.readOnly === true}
           key={field}
