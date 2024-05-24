@@ -34,8 +34,8 @@ const DialogComponent = ({ open, onConfirm, title = "Confirm", onCancel, okText,
             </DialogContent>
             {!hideButtons && (
                 <DialogActions>
-                    <Button onClick={onCancel}>{cancelText}</Button>
-                    <Button onClick={onConfirm} autoFocus>{okText}</Button>
+                    <Button onClick={onCancel} className='DeleteMenuItem'>{cancelText}</Button>
+                    <Button onClick={onConfirm} autoFocus className='DeleteMenuItem'>{okText}</Button>
                 </DialogActions>
             )}
         </Dialog>
