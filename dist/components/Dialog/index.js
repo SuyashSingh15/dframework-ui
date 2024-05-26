@@ -13,7 +13,7 @@ var _DialogContentText = _interopRequireDefault(require("@mui/material/DialogCon
 var _DialogTitle = _interopRequireDefault(require("@mui/material/DialogTitle"));
 var _IconButton = _interopRequireDefault(require("@mui/material/IconButton"));
 var _Close = _interopRequireDefault(require("@mui/icons-material/Close"));
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
 const DialogComponent = _ref => {
   let {
     open,
@@ -46,10 +46,12 @@ const DialogComponent = _ref => {
     onClick: onCancel,
     "aria-label": "close"
   }, /*#__PURE__*/_react.default.createElement(_Close.default, null))), /*#__PURE__*/_react.default.createElement(_DialogContent.default, null, /*#__PURE__*/_react.default.createElement(_DialogContentText.default, null, children)), !hideButtons && /*#__PURE__*/_react.default.createElement(_DialogActions.default, null, /*#__PURE__*/_react.default.createElement(_Button.default, {
-    onClick: onCancel
+    onClick: onCancel,
+    className: "DeleteMenuItem"
   }, cancelText), /*#__PURE__*/_react.default.createElement(_Button.default, {
     onClick: onConfirm,
-    autoFocus: true
+    autoFocus: true,
+    className: "DeleteMenuItem_okText"
   }, okText)));
 };
 exports.DialogComponent = DialogComponent;
