@@ -166,6 +166,7 @@ const GridBase = memo(({
     selectedId,
     refresh,
     setClientSideSortData,
+    signOut,
     ...props
 }) => {
     const [paginationModel, setPaginationModel] = useState({ pageSize: defaultPageSize, page: 0 });
@@ -648,7 +649,7 @@ const GridBase = memo(({
             }
             {isDeleting && !errorMessage && (<DialogComponent open={isDeleting} onConfirm={handleDelete} onCancel={() => setIsDeleting(false)} title="Confirm Delete"> {`${'Are you sure you want to delete'} ${record?.name}?`}</DialogComponent>)}
             {isEdit && (<DialogComponent open={isEdit} onConfirm={handleDelete} onCancel={() => setIsEdit(false)} title="Edit Form" hideButtons={true}>
-                <model.Form resetChildGrid={!!resetChildGrid} ids={String(record.id)} fetchData={fetchData} closeDialog={closingDialog} />
+                <model.Form resetChildGrid={!!resetChildGrid} signOut={signOut} ids={String(record.id)} fetchData={fetchData} closeDialog={closingDialog} />
             </DialogComponent>)}
             <Menu
                 anchorEl={anchorEl}

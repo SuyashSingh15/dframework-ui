@@ -40,7 +40,6 @@ const Field = ({
         }
     }
     fieldLabel = fieldLabel || column.label;
-    console.log(fieldLabel, column);
     fieldLabel += column.required ? " *" : "";
     return (
         <FormControl fullWidth key={field} variant="standard">

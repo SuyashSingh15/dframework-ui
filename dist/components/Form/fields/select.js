@@ -10,8 +10,8 @@ require("core-js/modules/web.dom-collections.iterator.js");
 var _react = _interopRequireDefault(require("react"));
 var _material = require("@mui/material");
 var _KeyboardArrowDown = _interopRequireDefault(require("@mui/icons-material/KeyboardArrowDown"));
-function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
-function _extends() { return _extends = Object.assign ? Object.assign.bind() : function (n) { for (var e = 1; e < arguments.length; e++) { var t = arguments[e]; for (var r in t) ({}).hasOwnProperty.call(t, r) && (n[r] = t[r]); } return n; }, _extends.apply(null, arguments); }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _extends() { _extends = Object.assign ? Object.assign.bind() : function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
 const Field = _ref => {
   var _column$dependentFiel, _column$dependentFiel2;
   let {
@@ -44,7 +44,6 @@ const Field = _ref => {
     }
   }
   fieldLabel = fieldLabel || column.label;
-  console.log(fieldLabel, column);
   fieldLabel += column.required ? " *" : "";
   return /*#__PURE__*/_react.default.createElement(_material.FormControl, {
     fullWidth: true,

@@ -21,6 +21,7 @@ const Form = ({
     ids,
     closeDialog,
     fetchData,
+    signOut,
     resetChildGrid  //boolean
 }) => {
     const { navigate, getParams } = useRouter();
@@ -78,7 +79,13 @@ const Form = ({
                 .then(success => {
                     if (success) {
                         closeDialog?.();
-                        model.addHeaderFilters === false && fetchData && fetchData();
+                        if (model.addHeaderFilters === false) {
+                            console.log(success);
+                            if (signOut && success.reAuth) {
+                                return signOut();
+                            }
+                            fetchData && fetchData();
+                        }
                         if (getList && !fetchData) {
                             getList();
                         }
