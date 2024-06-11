@@ -15,30 +15,46 @@ const Field = ({ column, field, fieldLabel, formik, otherProps, classes, onChang
 
   useEffect(() => {
     let dateTime;
-    if (column?.dependentField?.operator === ">=" && formik.values[column.dependentField.field] !== "" && !formik.values[field]) {
-      dateTime = dayjs(formik.values[column.dependentField.field]).add(5, 'minute');
-      if (dateTime.get("hour") > 12) {
-        setTimePeriod("PM");
-        updateFormikTime(time, "PM");
-      } else {
-        setTimePeriod("AM");
-        updateFormikTime(time, "AM");
-      }
-    }
+    const hasDependentField = column?.dependentField?.operator === ">=";
     if (formik.values[field]) {
-      if (column.isUtc) {
-        dateTime = dayjs
-          .utc(formik.values[field])
-          .utcOffset(dayjs().utcOffset(), true)
-          .format();
+      if (hasDependentField && dayjs(formik.values[field]).diff(dayjs(formik.values[column.dependentField.field]).add(5, 'minute'), "m") <= 0) {
+        const dependentFieldTime = dayjs(formik.values[column.dependentField.field]).add(5, 'minute')
+        if (dependentFieldTime.get("hour") > 12) {
+          setTimePeriod("PM");
+        } else {
+          setTimePeriod("AM");
+        }
+        setTime(dependentFieldTime);
+        formik.setFieldValue(field, dependentFieldTime.toISOString());
+      } else {
+        if (column.isUtc) {
+          dateTime = dayjs
+            .utc(formik.values[field])
+            .utcOffset(dayjs().utcOffset(), true)
+            .format();
+        }
+        else {
+          dateTime = dayjs(formik.values[field]);
+        }
+        setTime(dateTime);
+        setTimePeriod(dateTime.format("A"));
       }
-      else {
-        dateTime = dayjs(formik.values[field]);
-      }
-      setTime(dateTime);
-      setTimePeriod(dateTime.format("A"));
     }
-  }, [formik.values]);
+    else {
+      if (hasDependentField && formik.values[column.dependentField.field]) {
+        const dependentFieldTime = dayjs(formik.values[column.dependentField.field]).add(5, 'minute');
+        if (dependentFieldTime.get("hour") > 12) {
+          setTimePeriod("PM");
+        } else {
+          setTimePeriod("AM");
+        }
+        setTime(dependentFieldTime);
+        formik.setFieldValue(field, dependentFieldTime.toISOString());
+      } else {
+        setTime(null);
+      }
+    }
+  }, [JSON.stringify(formik.values), timePeriod]);
 
   const handleRadioChange = (event) => {
     setTimePeriod(event.target.value);
@@ -48,7 +64,8 @@ const Field = ({ column, field, fieldLabel, formik, otherProps, classes, onChang
   const handleTimeChange = (newTime) => {
     if (column.showExternalControls) {
       setTime(newTime);
-      updateFormikTime(newTime, timePeriod);
+      setTimePeriod(dayjs(newTime).format("A"));
+      updateFormikTime(newTime, dayjs(newTime).format("A"));
       return;
     } else if (column.isUtc) {
       newTime =
@@ -57,20 +74,18 @@ const Field = ({ column, field, fieldLabel, formik, otherProps, classes, onChang
           : null;
     }
     return formik.setFieldValue(field, newTime);
-
-
   };
+
   const updateFormikTime = (timeValue, period) => {
-    if (timeValue) {
-      let hours = timeValue.hour();
-      const minutes = timeValue.minute();
-      if (period === "PM" && hours < 12) hours += 12;
-      if (period === "AM" && hours === 12) hours = 0;
-
-      const dateTime = dayjs().hour(hours).minute(minutes);
-      formik.setFieldValue(field, dateTime.toISOString());
-    }
+    if (!timeValue) return;
+    let hours = timeValue.hour();
+    const minutes = timeValue.minute();
+    if (period === "PM" && hours < 12) hours += 12;
+    if (period === "AM" && hours >= 12) hours -= 12;
+    const dateTime = dayjs().hour(hours).minute(minutes);
+    formik.setFieldValue(field, dateTime.toISOString());
   };
+
   fieldLabel = fieldLabel || column.label;
   fieldLabel += column.required ? " *" : "";
   return (
