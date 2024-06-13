@@ -764,9 +764,9 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref3 => {
     slots: _objectSpread({
       headerFilterMenu: model.addHeaderFilters !== false ? false : null,
       columnMenu: model.addHeaderFilters ? undefined : () => null,
-      columnSortedDescendingIcon: model.addHeaderFilters ? _UnfoldMoreTwoTone.default : () => null,
-      columnSortedAscendingIcon: model.addHeaderFilters ? _UnfoldMoreTwoTone.default : () => null,
-      columnUnsortedIcon: model.addHeaderFilters ? _UnfoldMoreTwoTone.default : () => null,
+      // columnSortedDescendingIcon: model.addHeaderFilters ? UnfoldMoreTwoToneIcon : () => null,
+      // columnSortedAscendingIcon: model.addHeaderFilters ? UnfoldMoreTwoToneIcon : () => null,
+      // columnUnsortedIcon: model.addHeaderFilters ? UnfoldMoreTwoToneIcon : () => null,
       footer: gridFooter
     }, model.addHeaderFilters ? {
       toolbar: CustomToolbar
