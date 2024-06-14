@@ -762,9 +762,12 @@ const GridBase = /*#__PURE__*/(0, _react.memo)(_ref3 => {
     filterModel: filterModel,
     getRowId: getGridRowId,
     slots: _objectSpread({
-      headerFilterMenu: false,
-      toolbar: CustomToolbar,
-      footer: _footer.Footer
+      headerFilterMenu: model.addHeaderFilters !== false ? false : null,
+      columnMenu: model.addHeaderFilters ? undefined : () => null,
+      // columnSortedDescendingIcon: model.addHeaderFilters ? UnfoldMoreTwoToneIcon : () => null,
+      // columnSortedAscendingIcon: model.addHeaderFilters ? UnfoldMoreTwoToneIcon : () => null,
+      // columnUnsortedIcon: model.addHeaderFilters ? UnfoldMoreTwoToneIcon : () => null,
+      footer: gridFooter
     }, model.addHeaderFilters ? {
       toolbar: CustomToolbar
     } : {}),
