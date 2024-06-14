@@ -599,12 +599,9 @@ const GridBase = memo(({
                 filterModel={filterModel}
                 getRowId={getGridRowId}
                 slots={{
-                    headerFilterMenu: model.addHeaderFilters !== false ? false : null,
-                    columnMenu: model.addHeaderFilters ? undefined : () => null,
-                    // columnSortedDescendingIcon: model.addHeaderFilters ? UnfoldMoreTwoToneIcon : () => null,
-                    // columnSortedAscendingIcon: model.addHeaderFilters ? UnfoldMoreTwoToneIcon : () => null,
-                    // columnUnsortedIcon: model.addHeaderFilters ? UnfoldMoreTwoToneIcon : () => null,
-                    footer: gridFooter,
+                    headerFilterMenu: false,
+                    toolbar: CustomToolbar,
+                    footer: Footer,
                     ...(model.addHeaderFilters ? { toolbar: CustomToolbar } : {})
                 }}
                 slotProps={{
