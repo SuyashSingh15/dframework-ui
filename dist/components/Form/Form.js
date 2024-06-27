@@ -278,7 +278,8 @@ const Form = _ref => {
     return /*#__PURE__*/_react.default.createElement(_material.Box, {
       key: index,
       ml: 2,
-      mt: 4
+      mt: 4,
+      className: "custom-box"
     }, /*#__PURE__*/_react.default.createElement(model.CustomButton, {
       buttonFunction: button.text === 'Save' ? () => formik.handleSubmit() : () => {
         handleDiscardChanges();

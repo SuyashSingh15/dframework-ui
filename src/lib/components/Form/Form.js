@@ -209,7 +209,7 @@ const Form = ({
                 {model.addHeaderFilters === false && (<Box bottom={0} right={0} display='flex' justifyContent='flex-end' alignItems='center'>
                     {actionButtons.map((button, index) => {
                         return (
-                            <Box key={index} ml={2} mt={4} >
+                            <Box key={index} ml={2} mt={4} className="custom-box">
                                 <model.CustomButton
                                     buttonFunction={button.text === 'Save' ? () => formik.handleSubmit() : () => { handleDiscardChanges() }}
                                     disabled={button.text === 'Save' && (isLoading || !formik.isValid)}
