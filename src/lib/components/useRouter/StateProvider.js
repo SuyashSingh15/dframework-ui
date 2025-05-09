@@ -5,6 +5,12 @@ import request from '../Grid/httpRequest';
 import { locales } from '../mui/locale/localization';
 import dayjs from 'dayjs';
 import actionsStateProvider from './actions';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+
+// Extend dayjs with the plugins
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 const StateContext = createContext();
 const RouterContext = createContext(null);
@@ -34,25 +40,40 @@ const StateProvider = ({ children }) => {
     }
     return isDateFormatOnly ? 'DD-MM-YYYY' : 'DD-MM-YYYY hh:mm:ss A';
   }
-  async function getAllSavedPreferences({ preferenceName, Username, history, dispatchData, preferenceApi, tablePreferenceEnums }) {
+  async function getAllSavedPreferences({ preferenceName, Username, history, dispatchData, preferenceApi, defaultPreferenceEnums = {}, addDefaultPreference = false }) {
     const params = {
       action: 'list',
       id: preferenceName,
       Username
     }
-    const defaultCoolrPref = {
-      "prefName": "CoolR Default",
-      "prefId": 0,
-      "GridId": preferenceName,
-      "GridPreferenceId": 0,
-      "prefValue": tablePreferenceEnums[preferenceName],
-    }
     const response = await request({ url: preferenceApi, params, history, dispatchData });
-    let preferences = response?.preferences ? [defaultCoolrPref,...response?.preferences] : defaultCoolrPref
+    let preferences = response?.preferences || [];
+    if (addDefaultPreference) {
+      const defaultPref = {
+        "prefName": "Default",
+        "prefId": 0,
+        "GridId": preferenceName,
+        "GridPreferenceId": 0,
+        "prefValue": defaultPreferenceEnums[preferenceName],
+      }
+      preferences = [defaultPref, ...preferences];
+    }
     dispatchData({ type: actionsStateProvider.UDPATE_PREFERENCES, payload: preferences });
-    dispatchData({ type: actionsStateProvider.TOTAL_PREFERENCES, payload: response?.preferences.length });
+    dispatchData({ type: actionsStateProvider.TOTAL_PREFERENCES, payload: preferences.length });
   }
-  async function applyDefaultPreferenceIfExists({ gridRef, history, dispatchData, Username, preferenceName, setIsGridPreferenceFetched, preferenceApi, tablePreferenceEnums }) {
+
+  /**
+ * Filters out data elements whose fields do not exist in the grid's columns.
+ *
+ * @param {Object} params - The parameters object.
+ * @param {Object} params.gridRef - A reference to the grid component.
+ * @param {Array} params.data - The data array to filter.
+ * @returns {Array} The filtered array containing only elements with existing columns in the grid.
+ */
+  const filterNonExistingColumns = ({ gridRef, data }) => {
+    return data.filter(ele => gridRef.current.getColumnIndex(ele.field) !== -1);
+  };
+  async function applyDefaultPreferenceIfExists({ gridRef, history, dispatchData, Username, preferenceName, setIsGridPreferenceFetched, preferenceApi, defaultPreferenceEnums = {} }) {
     const params = {
       action: 'default',
       id: preferenceName,
@@ -60,18 +81,16 @@ const StateProvider = ({ children }) => {
     }
 
     const response = await request({ url: preferenceApi, params, history, dispatchData });
-    let userPreferenceCharts = response?.prefValue ? JSON.parse(response.prefValue) : tablePreferenceEnums[preferenceName];
-    if (userPreferenceCharts) {
-			userPreferenceCharts?.gridColumn.forEach(ele => {
-				if (gridRef.current.getColumnIndex(ele.field) !== -1) {
-					gridRef.current.setColumnWidth(ele.field, ele.width);
-				}
-			})
+    let userPreferenceCharts = response?.prefValue ? JSON.parse(response.prefValue) : defaultPreferenceEnums[preferenceName];
+    if (userPreferenceCharts && Object.keys(userPreferenceCharts).length) {
+      userPreferenceCharts.gridColumn = filterNonExistingColumns({ gridRef, data: userPreferenceCharts.gridColumn });
+      userPreferenceCharts.sortModel = filterNonExistingColumns({ gridRef, data: userPreferenceCharts.sortModel });
+      userPreferenceCharts.filterModel.items = filterNonExistingColumns({ gridRef, data: userPreferenceCharts.filterModel.items });
       gridRef.current.setColumnVisibilityModel(userPreferenceCharts.columnVisibilityModel);
       gridRef.current.setPinnedColumns(userPreferenceCharts.pinnedColumns);
       gridRef.current.setSortModel(userPreferenceCharts.sortModel || []);
       gridRef.current.setFilterModel(userPreferenceCharts?.filterModel);
-      dispatchData({ type: actionsStateProvider.SET_CURRENT_PREFERENCE_NAME, payload: response?.prefValue ? response.prefName : 'CoolR Default' });
+      dispatchData({ type: actionsStateProvider.SET_CURRENT_PREFERENCE_NAME, payload: response?.prefValue ? response.prefName : 'Default' });
     }
     if (setIsGridPreferenceFetched) {
       setIsGridPreferenceFetched(true);
@@ -81,10 +100,13 @@ const StateProvider = ({ children }) => {
     dispatchData({ type: actionsStateProvider.SET_CURRENT_PREFERENCE_NAME, payload: null });
   }
 
-  function formatDate(value, useSystemFormat, showOnlyDate = false, state) {
+  function formatDate({ value, useSystemFormat, showOnlyDate = false, state, timeZone }) {
     if (value) {
       const format = systemDateTimeFormat(useSystemFormat, showOnlyDate, state); // Pass 'state' as an argument
-      return dayjs(value).format(format);
+      if(!timeZone){
+        return dayjs(value).format(format);
+      }
+      return dayjs(value).tz(timeZone).format(format);
     }
     return '-';
   }

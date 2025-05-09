@@ -14,27 +14,31 @@ const field = _ref => {
   let {
     column,
     field,
-    fieldLabel,
     formik,
-    otherProps,
-    classes,
-    onChange
+    otherProps
   } = _ref;
   return /*#__PURE__*/_react.default.createElement(_TextField.default, _extends({
     type: "text",
-    variant: "standard",
+    variant: column.variant || "standard",
     InputProps: {
-      readOnly: (column === null || column === void 0 ? void 0 : column.readOnly) === true
+      readOnly: (column === null || column === void 0 ? void 0 : column.readOnly) === true,
+      sx: column !== null && column !== void 0 && column.readOnly ? {
+        backgroundColor: '#dfdede'
+      } // Light grey background for read-only inputs
+      : undefined
     },
     key: field,
     required: column === null || column === void 0 ? void 0 : column.required,
+    multiline: column.multiline,
+    rows: column.rows || 5,
     fullWidth: true,
     name: field,
     value: formik.values[field],
     onChange: formik.handleChange,
     onBlur: formik.handleBlur,
     error: formik.touched[field] && Boolean(formik.errors[field]),
-    helperText: formik.touched[field] && formik.errors[field]
+    helperText: formik.touched[field] && formik.errors[field],
+    autoComplete: column.autoComplete
   }, otherProps));
 };
 var _default = exports.default = field;

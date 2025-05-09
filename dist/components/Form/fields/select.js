@@ -7,6 +7,10 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 require("core-js/modules/es.parse-int.js");
+require("core-js/modules/esnext.iterator.constructor.js");
+require("core-js/modules/esnext.iterator.filter.js");
+require("core-js/modules/esnext.iterator.find.js");
+require("core-js/modules/esnext.iterator.map.js");
 require("core-js/modules/web.dom-collections.iterator.js");
 var _react = _interopRequireWildcard(require("react"));
 var _material = require("@mui/material");
@@ -23,7 +27,7 @@ const SelectField = _ref => {
   let {
     column,
     field,
-    fieldLabel,
+    label,
     formik,
     activeRecord,
     lookups,
@@ -32,14 +36,36 @@ const SelectField = _ref => {
     onChange,
     getRecordAndLookups
   } = _ref;
-  const [loading, setIsloading] = _react.default.useState(false);
-  const [options, setOptions] = _react.default.useState(typeof column.lookup === 'string' ? lookups[column.lookup] : column.lookup);
+  const userSelected = _react.default.useRef(false);
+  const {
+    filter,
+    placeHolder
+  } = column;
+  const initialOptions = (0, _react.useMemo)(() => {
+    let options = typeof column.lookup === 'string' ? lookups[column.lookup] : column.lookup;
+    if (filter) {
+      return filter({
+        options,
+        currentValue: formik.values[field],
+        state: formik.values
+      });
+    }
+    return options;
+  }, [column.lookup, filter, lookups, field, formik.values]);
+  const [options, setOptions] = _react.default.useState(initialOptions);
+  (0, _react.useEffect)(() => {
+    if (!userSelected.current) {
+      setOptions(initialOptions);
+    }
+  }, [initialOptions, userSelected.current]);
   const setActiveRecord = lookups => {
     const {
       State
     } = lookups;
     if (!State) return;
-    setOptions(State);
+    if (!userSelected.current) {
+      setOptions(State);
+    }
   };
   const onOpen = () => {
     if (!column.parentComboField) return;
@@ -48,7 +74,7 @@ const SelectField = _ref => {
     getRecordAndLookups({
       scopeId: formik.values[valueField],
       lookups: column.lookup,
-      customSetIsLoading: setIsloading,
+      customSetIsLoading: () => {},
       customSetActiveRecord: setActiveRecord
     });
   };
@@ -56,6 +82,13 @@ const SelectField = _ref => {
     onOpen();
   }, [formik.values[column.parentComboField]]);
   let inputValue = formik.values[field];
+  if (options !== null && options !== void 0 && options.length && !inputValue && !column.multiSelect && "IsDefault" in options[0]) {
+    const isDefaultOption = options.find(e => e.IsDefault);
+    if (isDefaultOption) {
+      inputValue = isDefaultOption.value;
+      formik.setFieldValue(field, isDefaultOption.value);
+    }
+  }
   if (column.multiSelect) {
     if (!inputValue || inputValue.length === 0) {
       inputValue = [];
@@ -65,25 +98,24 @@ const SelectField = _ref => {
       }
     }
   }
+  const handleChange = event => {
+    formik.handleChange(event); // Update formik's state
+    userSelected.current = true;
+  };
   return /*#__PURE__*/_react.default.createElement(_FormControl.default, {
     fullWidth: true,
     key: field,
+    error: formik.touched[field] && formik.errors[field],
     variant: "standard"
-  }, /*#__PURE__*/_react.default.createElement(_InputLabel.default, null, fieldLabel), /*#__PURE__*/_react.default.createElement(_Select.default, _extends({
+  }, /*#__PURE__*/_react.default.createElement(_InputLabel.default, null, placeHolder ? placeHolder : ""), /*#__PURE__*/_react.default.createElement(_Select.default, _extends({
     IconComponent: _KeyboardArrowDown.default
   }, otherProps, {
-    name: field
-    // disabled={loading}
-    ,
+    name: field,
     onOpen: onOpen,
     multiple: column.multiSelect === true,
     readOnly: column.readOnly === true,
-    value: "".concat(inputValue)
-    // label={fieldLabel}
-    ,
-    onChange: formik.handleChange
-    // onChange={onChange}
-    ,
+    value: "".concat(inputValue),
+    onChange: handleChange,
     onBlur: formik.handleBlur,
     MenuProps: {
       classes: {
@@ -92,7 +124,8 @@ const SelectField = _ref => {
     }
   }), Array.isArray(options) && options.map(option => /*#__PURE__*/_react.default.createElement(_MenuItem.default, {
     key: option.value,
-    value: option.value
+    value: option.value,
+    disabled: option.isDisabled
   }, option.label))), /*#__PURE__*/_react.default.createElement(_material.FormHelperText, null, formik.touched[field] && formik.errors[field]));
 };
 var _default = exports.default = SelectField;

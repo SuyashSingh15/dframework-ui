@@ -6,10 +6,14 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
-require("core-js/modules/es.array.includes.js");
 require("core-js/modules/es.array.push.js");
 require("core-js/modules/es.promise.js");
 require("core-js/modules/es.string.trim.js");
+require("core-js/modules/esnext.iterator.constructor.js");
+require("core-js/modules/esnext.iterator.filter.js");
+require("core-js/modules/esnext.iterator.find.js");
+require("core-js/modules/esnext.iterator.for-each.js");
+require("core-js/modules/esnext.iterator.map.js");
 require("core-js/modules/web.dom-collections.iterator.js");
 var _react = _interopRequireWildcard(require("react"));
 var _Close = _interopRequireDefault(require("@mui/icons-material/Close"));
@@ -25,6 +29,7 @@ var _SnackBar = require("../SnackBar");
 var _httpRequest = _interopRequireDefault(require("./httpRequest"));
 var _StateProvider = require("../useRouter/StateProvider");
 var _actions = _interopRequireDefault(require("../useRouter/actions"));
+var _Add = _interopRequireDefault(require("@mui/icons-material/Add"));
 function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
 function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function _getRequireWildcardCache(e) { return e ? t : r; })(e); }
 function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != typeof e && "function" != typeof e) return { default: e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && {}.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n.default = e, t && t.set(e, n), n; }
@@ -100,7 +105,6 @@ const initialValues = {
   prefDesc: '',
   isDefault: false
 };
-const defaultCoolRPrefName = "coolr default";
 const GridPreferences = _ref => {
   var _stateData$gridSettin, _stateData$gridSettin2;
   let {
@@ -110,16 +114,12 @@ const GridPreferences = _ref => {
     setIsGridPreferenceFetched
   } = _ref;
   const {
-    systemDateTimeFormat,
     stateData,
     dispatchData,
-    formatDate,
     removeCurrentPreferenceName,
-    getAllSavedPreferences,
-    applyDefaultPreferenceIfExists
+    getAllSavedPreferences
   } = (0, _StateProvider.useStateContext)();
   const {
-    pathname,
     navigate
   } = (0, _StateProvider.useRouter)();
   const apiRef = (0, _xDataGridPremium.useGridApiRef)();
@@ -130,18 +130,19 @@ const GridPreferences = _ref => {
   const [formType, setFormType] = (0, _react.useState)();
   const [menuAnchorEl, setMenuAnchorEl] = (0, _react.useState)();
   const [openPreferenceExistsModal, setOpenPreferenceExistsModal] = (0, _react.useState)(false);
+  const [openConfirmDeleteDialog, setOpenConfirmDeleteDialog] = (0, _react.useState)({});
   const {
     Username
   } = stateData !== null && stateData !== void 0 && stateData.getUserData ? stateData.getUserData : {};
   const preferences = stateData === null || stateData === void 0 ? void 0 : stateData.preferences;
   const currentPreference = stateData === null || stateData === void 0 ? void 0 : stateData.currentPreference;
   const preferenceApi = stateData === null || stateData === void 0 || (_stateData$gridSettin = stateData.gridSettings) === null || _stateData$gridSettin === void 0 || (_stateData$gridSettin = _stateData$gridSettin.permissions) === null || _stateData$gridSettin === void 0 ? void 0 : _stateData$gridSettin.preferenceApi;
-  const tablePreferenceEnums = stateData === null || stateData === void 0 || (_stateData$gridSettin2 = stateData.gridSettings) === null || _stateData$gridSettin2 === void 0 || (_stateData$gridSettin2 = _stateData$gridSettin2.permissions) === null || _stateData$gridSettin2 === void 0 ? void 0 : _stateData$gridSettin2.tablePreferenceEnums;
+  const defaultPreferenceEnums = stateData === null || stateData === void 0 || (_stateData$gridSettin2 = stateData.gridSettings) === null || _stateData$gridSettin2 === void 0 || (_stateData$gridSettin2 = _stateData$gridSettin2.permissions) === null || _stateData$gridSettin2 === void 0 ? void 0 : _stateData$gridSettin2.defaultPreferenceEnums;
   const filterModel = (0, _xDataGridPremium.useGridSelector)(gridRef, _xDataGridPremium.gridFilterModelSelector);
   const sortModel = (0, _xDataGridPremium.useGridSelector)(gridRef, _xDataGridPremium.gridSortModelSelector);
   const validationSchema = (0, _react.useMemo)(() => {
     let schema = yup.object({
-      prefName: yup.string().required('Preference Name is Required').max(20, 'Maximum Length is 20'),
+      prefName: yup.string().trim(true).required('Preference Name is Required').max(20, 'Maximum Length is 20'),
       prefDesc: yup.string().max(100, "Description maximum length is 100")
     });
     return schema;
@@ -160,7 +161,8 @@ const GridPreferences = _ref => {
     validationSchema: validationSchema,
     onSubmit: async values => {
       await savePreference(values);
-    }
+    },
+    mode: "onBlur"
   });
   const handleOpen = event => {
     setMenuAnchorEl(event === null || event === void 0 ? void 0 : event.currentTarget);
@@ -186,7 +188,7 @@ const GridPreferences = _ref => {
       history: navigate,
       dispatchData
     });
-    if (response === true) {
+    if (response === true || response !== null && response !== void 0 && response.success) {
       if (prefName === currentPreference) {
         removeCurrentPreferenceName({
           dispatchData
@@ -201,16 +203,12 @@ const GridPreferences = _ref => {
     }
     await applyPreference(prefId);
   };
-  function isNotCoolRDefault() {
-    let prefName = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
-    return [defaultCoolRPrefName].includes(prefName.trim().toLowerCase());
-  }
   const savePreference = async values => {
     var _filterModel$items;
     const presetName = values.prefName.trim();
     const preferenceAlreadyExists = preferences.findIndex(ele => ele.prefName === presetName);
-    const isNotCoolRDefaultName = isNotCoolRDefault(presetName);
-    if (preferenceAlreadyExists > -1 && formType === formTypes.Add || isNotCoolRDefaultName) {
+    // if any default preferences maintain them inside the preferences array.
+    if (preferenceAlreadyExists > -1 && (formType === formTypes.Add || preferences[preferenceAlreadyExists].prefId !== values.prefId)) {
       setOpenPreferenceExistsModal(true);
       return;
     }
@@ -269,8 +267,9 @@ const GridPreferences = _ref => {
       history: navigate,
       dispatchData
     });
-    if (response === true) {
-      snackbar.showMessage('Preference Saved Successfully.');
+    const action = formType === formTypes.Add ? "Added" : "Saved";
+    if (response === true || (response === null || response === void 0 ? void 0 : response.success) === true) {
+      snackbar.showMessage("Preference ".concat(action, " Successfully."));
     }
     getAllSavedPreferences({
       preferenceName,
@@ -278,15 +277,15 @@ const GridPreferences = _ref => {
       history: navigate,
       dispatchData,
       preferenceApi,
-      tablePreferenceEnums
+      defaultPreferenceEnums
     });
   };
   const applyPreference = async prefId => {
     let userPreferenceCharts;
-    let coolrDefaultPreference = 'CoolR Default';
-    // Check if prefId is 0, if so, use tablePreferenceEnums, otherwise fetch from API
+    let defaultPreference = 'Default';
+    // Check if prefId is 0, if so, use defaultPreferenceEnums, otherwise fetch from API
     if (prefId === 0) {
-      userPreferenceCharts = tablePreferenceEnums[preferenceName] || null;
+      userPreferenceCharts = defaultPreferenceEnums[preferenceName] || null;
     } else {
       const params = {
         action: 'load',
@@ -301,7 +300,7 @@ const GridPreferences = _ref => {
         dispatchData
       });
       userPreferenceCharts = response !== null && response !== void 0 && response.prefValue ? JSON.parse(response.prefValue) : null;
-      coolrDefaultPreference = response !== null && response !== void 0 && response.prefValue ? response.prefName : '';
+      defaultPreference = response !== null && response !== void 0 && response.prefValue ? response.prefName : '';
     }
 
     // If userPreferenceCharts is available, apply preferences to the grid
@@ -334,7 +333,7 @@ const GridPreferences = _ref => {
       gridRef.current.setFilterModel(filterModel);
       dispatchData({
         type: _actions.default.SET_CURRENT_PREFERENCE_NAME,
-        payload: coolrDefaultPreference
+        payload: defaultPreference
       });
       setIsGridPreferenceFetched(true);
     }
@@ -357,6 +356,22 @@ const GridPreferences = _ref => {
     handleClose();
     setOpenDialog(false);
   };
+  const confirmDeletePreference = async () => {
+    const {
+      prefId,
+      preferenceName: currentPrefname
+    } = openConfirmDeleteDialog;
+    await deletePreference(prefId, currentPrefname);
+    getAllSavedPreferences({
+      preferenceName,
+      history: navigate,
+      dispatchData,
+      Username,
+      preferenceApi,
+      defaultPreferenceEnums
+    });
+    setOpenConfirmDeleteDialog({});
+  };
   const onCellClick = async (cellParams, event, details) => {
     let action = cellParams.field === 'editAction' ? actionTypes.Edit : cellParams.field === 'deleteAction' ? actionTypes.Delete : null;
     if (cellParams.id === 0 && (action === actionTypes.Edit || action === actionTypes.Delete)) {
@@ -369,28 +384,34 @@ const GridPreferences = _ref => {
       setOpenForm(true);
     }
     if (action === actionTypes.Delete) {
-      var _cellParams$row;
-      await deletePreference(cellParams.id, cellParams === null || cellParams === void 0 || (_cellParams$row = cellParams.row) === null || _cellParams$row === void 0 ? void 0 : _cellParams$row.prefName);
-      getAllSavedPreferences({
-        preferenceName,
-        history: navigate,
-        dispatchData,
-        Username,
-        preferenceApi,
-        tablePreferenceEnums
+      setOpenConfirmDeleteDialog({
+        prefId: cellParams.id,
+        preferenceName: cellParams.row.prefName
       });
     }
   };
   const prefName = formik.values.prefName.trim();
+
+  // field is within a dialog that's not visible when the top-level component mounts
+  const focusUsernameInputField = input => {
+    var _input$dataset;
+    if (input && !((_input$dataset = input.dataset) !== null && _input$dataset !== void 0 && _input$dataset.touched)) {
+      setTimeout(() => {
+        input.focus();
+        input.dataset.touched = "true";
+      }, 10);
+    }
+  };
+  const isManageForm = formType === formTypes.Manage;
   return /*#__PURE__*/_react.default.createElement(_material.Box, null, /*#__PURE__*/_react.default.createElement(_material.Button, {
     id: "grid-preferences-btn",
     "aria-controls": menuAnchorEl ? 'basic-menu' : undefined,
     "aria-haspopup": "true",
     "aria-expanded": menuAnchorEl ? 'true' : undefined,
     onClick: handleOpen,
-    title: "Preference",
+    title: "Preferences",
     startIcon: /*#__PURE__*/_react.default.createElement(_Settings.default, null)
-  }, "Preferences"), /*#__PURE__*/_react.default.createElement(_material.Menu, {
+  }, "Preferences ", currentPreference && "(".concat(currentPreference, ")")), /*#__PURE__*/_react.default.createElement(_material.Menu, {
     id: "grid-preference-menu",
     anchorEl: menuAnchorEl,
     open: !!menuAnchorEl,
@@ -419,12 +440,12 @@ const GridPreferences = _ref => {
     component: _material.ListItemButton,
     dense: true,
     onClick: () => openModal(formTypes.Add)
-  }, "Add Preference"), /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
+  }, /*#__PURE__*/_react.default.createElement(_material.ListItemIcon, null, /*#__PURE__*/_react.default.createElement(_Add.default, null)), "Add Preference"), /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
     component: _material.ListItemButton,
     dense: true,
     divider: (preferences === null || preferences === void 0 ? void 0 : preferences.length) > 0,
     onClick: () => openModal(formTypes.Manage, false)
-  }, "Manage Preferences"), preferences === null || preferences === void 0 ? void 0 : preferences.map((ele, key) => {
+  }, /*#__PURE__*/_react.default.createElement(_material.ListItemIcon, null, /*#__PURE__*/_react.default.createElement(_Settings.default, null)), "Manage Preferences"), preferences === null || preferences === void 0 ? void 0 : preferences.map((ele, key) => {
     const {
       prefName,
       prefDesc,
@@ -433,6 +454,7 @@ const GridPreferences = _ref => {
     return /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
       onClick: () => applySelectedPreference(prefId, key),
       component: _material.ListItem,
+      selected: currentPreference === prefName,
       key: "pref-item-".concat(key),
       title: prefDesc,
       dense: true
@@ -441,7 +463,7 @@ const GridPreferences = _ref => {
     }));
   })), /*#__PURE__*/_react.default.createElement(_material.Dialog, {
     open: openDialog,
-    maxWidth: formType === formTypes.Manage ? 'md' : 'sm',
+    maxWidth: isManageForm ? 'md' : 'sm',
     fullWidth: true
   }, /*#__PURE__*/_react.default.createElement(_material.DialogTitle, {
     sx: {
@@ -453,7 +475,7 @@ const GridPreferences = _ref => {
     columnGap: 2
   }, /*#__PURE__*/_react.default.createElement(_material.Typography, {
     variant: "h5"
-  }, formType, " Preference"))), /*#__PURE__*/_react.default.createElement(_material.DialogContent, null, openForm && /*#__PURE__*/_react.default.createElement(_material.Grid, {
+  }, formType, " Preference", formType === formTypes.Manage ? 's' : ''))), /*#__PURE__*/_react.default.createElement(_material.DialogContent, null, openForm && /*#__PURE__*/_react.default.createElement(_material.Grid, {
     component: 'form',
     onSubmit: formik.handleSubmit,
     rowGap: 2,
@@ -474,13 +496,17 @@ const GridPreferences = _ref => {
     variant: "outlined",
     size: "small",
     margin: "dense",
-    label: "Preference Name",
+    label: /*#__PURE__*/_react.default.createElement("span", null, "Preference Name ", /*#__PURE__*/_react.default.createElement("span", {
+      style: {
+        color: 'red'
+      }
+    }, "*")),
     name: 'prefName',
     onChange: formik.handleChange,
     error: !!formik.errors.prefName,
     helperText: formik.errors.prefName,
-    required: true,
-    fullWidth: true
+    fullWidth: true,
+    inputRef: focusUsernameInputField
   })), /*#__PURE__*/_react.default.createElement(_material.Grid, {
     item: true,
     xs: 12
@@ -566,7 +592,7 @@ const GridPreferences = _ref => {
     disableRowGrouping: true,
     disableRowSelectionOnClick: true,
     autoHeight: true
-  })))), formType === formTypes.Manage && /*#__PURE__*/_react.default.createElement(_material.DialogActions, null, /*#__PURE__*/_react.default.createElement(_material.Button, {
+  })))), isManageForm && /*#__PURE__*/_react.default.createElement(_material.DialogActions, null, /*#__PURE__*/_react.default.createElement(_material.Button, {
     color: "error",
     variant: "contained",
     size: "small",
@@ -591,6 +617,17 @@ const GridPreferences = _ref => {
     size: "small",
     onClick: () => setOpenPreferenceExistsModal(false),
     disableElevation: true
+  }, "Ok"))), /*#__PURE__*/_react.default.createElement(_material.Dialog, {
+    open: openConfirmDeleteDialog.preferenceName,
+    maxWidth: "sm",
+    fullWidth: true
+  }, /*#__PURE__*/_react.default.createElement(_material.DialogTitle, null, "Confirm delete"), /*#__PURE__*/_react.default.createElement(_material.DialogContent, null, /*#__PURE__*/_react.default.createElement(_material.DialogContentText, {
+    id: "alert-dialog-description"
+  }, "Are you sure you wish to delete \"", openConfirmDeleteDialog.preferenceName, "\"")), /*#__PURE__*/_react.default.createElement(_material.DialogActions, null, /*#__PURE__*/_react.default.createElement(_material.Button, {
+    onClick: () => setOpenConfirmDeleteDialog({})
+  }, "Cancel"), /*#__PURE__*/_react.default.createElement(_material.Button, {
+    onClick: confirmDeletePreference,
+    autoFocus: true
   }, "Ok"))));
 };
 var _default = exports.default = GridPreferences;

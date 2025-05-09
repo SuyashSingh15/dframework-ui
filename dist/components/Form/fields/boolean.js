@@ -19,7 +19,7 @@ const field = _ref => {
   let {
     column,
     field,
-    fieldLabel,
+    label,
     formik,
     otherProps,
     classes,
@@ -33,12 +33,12 @@ const field = _ref => {
   }, /*#__PURE__*/React.createElement(_FormControlLabel.default, {
     control: /*#__PURE__*/React.createElement(_Checkbox.default, _extends({}, otherProps, {
       name: field,
-      readOnly: column.readOnly === true,
-      checked: formik.values[field],
+      disabled: (column === null || column === void 0 ? void 0 : column.readOnly) === true || (column === null || column === void 0 ? void 0 : column.disabled),
+      checked: formik.values[field] === true,
       onChange: handleChange,
       onBlur: formik.handleBlur
-    })),
-    label: fieldLabel
+    }))
+    // label={label} commenting this code due to showing two label on ui 
   }), /*#__PURE__*/React.createElement(_material.FormHelperText, null, formik.touched[field] && formik.errors[field]));
 };
 var _default = exports.default = field;
