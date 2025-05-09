@@ -7,17 +7,16 @@ import { withTranslation } from "react-i18next";
 import MuiTypography from "../Typography";
 import useMobile from "../useMobile";
 import helpng from "../../assets/images/question.png";
-import { Breadcrumbs, Typography } from "@mui/material";
+import { Breadcrumbs, Typography, Link as MuiLink, Button, IconButton, Grid } from "@mui/material";
+import HelpIcon from '@mui/icons-material/Help';
 import HelpModal from "../HelpModal";
 import actionsStateProvider from "../useRouter/actions";
 import { useStateContext } from "../useRouter/StateProvider";
+import { Card, CardContent } from '@mui/material';
 
 function PageTitle(props) {
-  let gridUrl;
   const {
-    pageTitleStyle,
     mediaQuery,
-    pageTitleBackground,
     titleHeading,
     name = null,
     icon: Icon,
@@ -29,13 +28,15 @@ function PageTitle(props) {
     titleClass = "text-theme-blue text-max-width",
     showTitleInfo,
     showBreadcrumbs,
-    breadcrumbs
+    breadcrumbs = [],
+    nestedGrid = false,
+    breadcrumbColor,
   } = props;
   const [showTooltip, setShowTooltip] = useState(false);
   const isMobile = useMobile(true);
-  const { dispatchData, stateData } = useStateContext();
-
-  gridUrl = stateData.gridSettings.permissions.Url;
+  const { dispatchData, stateData = {} } = useStateContext();
+  const { permissions = {} } = stateData.gridSettings || {}
+  const gridUrl = permissions.Url;
   const showImage = false;
   const card = [
     { title: "New Features", subTitle: "", url: 'https://coolrgroup.tourial.com/5df412f2-7667-48d6-8599-ccec9a3a4192', },
@@ -53,6 +54,11 @@ function PageTitle(props) {
       type: actionsStateProvider.OPEN_MODAL, payload: { status: true, data: obj }
     })
   }
+  const breadcrumbsLasIndex = breadcrumbs.length - 1
+  const needToShowBreadcrumbs = showBreadcrumbs && breadcrumbs.length;
+  const handleBack = () => {
+    window.history.back(); // Navigate to the previous page when clicked
+  };
 
   return (
     <>
@@ -60,100 +66,108 @@ function PageTitle(props) {
         <title>{title}</title>
       </Helmet>
       <MuiTypography className="print-only" text={titleHeading} />
-      <div
-        className={
-          !showTitleInfo ? clsx(pageTitleStyle, pageTitleBackground) : ""
-        }
-      >
-        {/* Add BreadCrumbs  */}
-        {showBreadcrumbs && breadcrumbs && (
-          <Breadcrumbs aria-label="breadcrumb" separator=">" className={`${titleClass} breadcrumbs-text-title text-max-width`}>
-            {breadcrumbs.map((breadcrumb, index) => (
-              <Typography sx={{ fontSize: '16px', fontWeight: "bold" }} key={index} className={`${titleClass} breadcrumbs-text-title text-max-width`}>
-                {breadcrumb.text}
-              </Typography>
-            ))}
-          </Breadcrumbs>
-        )}
-
-        {/* Icon render */}
-        {Icon && (
-          <Box>
-            <Icon
-              iconclass={iconclass || "cameraIconTitle"}
-              className={iconclass || "cameraIconTitle"}
-            />
-          </Box>
-        )}
-        {/* Title render */}
-        <Box className="app-page-title--first">
-          {mediaQuery ? (
-            <div
-              className={`app-page-title--heading-media ${isMobile ? "small-text pl-2" : ""
-                }`}
-            >
-              <h1
-                className={`${titleClass}  ${isMobile ? "display-4 pl-2" : ""
-                  } `}
-              >
-                {titleHeading}
-              </h1>
-            </div>
-          ) : (
-            <div className={`${titleDescription ? "mt-2" : ""}`}>
-              <div style={{ display: isMobile ? 'block' : "flex", alignItems: "center" }}>
-                <div style={{ flex: "1 0 auto" }}>
-                  {showTitleInfo ? (
-                    showTitleInfo
-                  ) : (
-                    <MuiTypography
-                      className={`${titleClass} page-text-title`}
-                      variant="p"
-                      text={titleHeading}
-                      name={name}
-                    />
-                  )}
-                  {titleDescription && (
-                    <MuiTypography
-                      className={`${titleClass} page-text-description`}
-                      variant="p"
-                      component="p"
-                      text={titleDescription}
-                    />
-                  )}
-                </div>
-                {/* Only show the image if the title matches */}
-                {
-                  showImage && (
-                    <Tooltip title={"Help"} open={showTooltip} placement="right" className="tooltip-help">
-                      <img
-                        src={helpng}
-                        alt="help"
-                        style={{
-                          width: "40px",
-                          height: "40px",
-                          marginLeft: "10px",
-                          marginTop: "5px"
-                        }}
-                        onClick={() => { handleCardClick(titleHeading) }}
-                        onMouseEnter={() => setShowTooltip(true)}
-                        onMouseLeave={() => setShowTooltip(false)}
-                      />
-                    </Tooltip>
-                  )}
-              </div>
-            </div>
+      {needToShowBreadcrumbs && (<> <Card sx={{ mb: 3 }}>
+        <CardContent sx = {{ backgroundColor: breadcrumbColor || '#fff' }}>
+          {/* Add BreadCrumbs  */}
+          <Grid container>
+            <Grid item sx={{ display: 'flex', alignItems: 'center', flex: 1 }}>
+              <Breadcrumbs variant="h5" aria-label="breadcrumb" separator=">" className={`${titleClass} breadcrumbs-text-title text-max-width`}>
+                {breadcrumbs.map((breadcrumb, index) => index < breadcrumbsLasIndex ? (
+                  <MuiLink onClick={handleBack} key={index} className={`${titleClass} breadcrumbs-text-title text-max-width`} variant="inherit" sx={{ textDecoration: 'none', color: '#1976d2' }}>
+                    {breadcrumb.text}
+                  </MuiLink>
+                ) : <Typography key={index} className={`${titleClass} breadcrumbs-text-title text-max-width`} variant="inherit">
+                  {breadcrumb.text}
+                </Typography>)}
+              </Breadcrumbs>
+            </Grid>
+            {(breadcrumbs.length > 1 || nestedGrid) && <Grid item sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end'}}>
+              <Button variant="contained" onClick={handleBack}>Back</Button>
+            </Grid>}
+            <Grid item sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+              <IconButton color="primary" title='Help' size="large">
+                <HelpIcon fontSize="inherit" />
+              </IconButton>
+            </Grid>
+          </Grid>
+          {Icon && (
+            <Box>
+              <Icon
+                iconclass={iconclass || "cameraIconTitle"}
+                className={iconclass || "cameraIconTitle"}
+              />
+            </Box>
           )}
-        </Box>
-        {/* For Mobile */}
-        {!isMobile && (
-          <>
-            <Box> {RightComponent && <RightComponent />} </Box>
-            <Box> {mobileRightComponent} </Box>
-          </>
-        )}
-      </div>
-      <HelpModal />
+          {/* Title render */}
+          <Box className="app-page-title--first">
+            {mediaQuery ? (
+              <div
+                className={`app-page-title--heading-media ${isMobile ? "small-text pl-2" : ""
+                  }`}
+              >
+                <h1
+                  className={`${titleClass}  ${isMobile ? "display-4 pl-2" : ""
+                    } `}
+                >
+                  {titleHeading}
+                </h1>
+              </div>
+            ) : (
+              <div className={`${titleDescription ? "mt-2" : ""}`}>
+                <div style={{ display: isMobile ? 'block' : "flex", alignItems: "center" }}>
+                  <div style={{ flex: "1 0 auto" }}>
+                    {showTitleInfo ? (
+                      showTitleInfo
+                    ) : (
+                      <MuiTypography
+                        className={`${titleClass} page-text-title`}
+                        variant="p"
+                        text={titleHeading}
+                        name={name}
+                      />
+                    )}
+                    {titleDescription && (
+                      <MuiTypography
+                        className={`${titleClass} page-text-description`}
+                        variant="p"
+                        component="p"
+                        text={titleDescription}
+                      />
+                    )}
+                  </div>
+                  {/* Only show the image if the title matches */}
+                  {
+                    showImage && (
+                      <Tooltip title={"Help"} open={showTooltip} placement="right" className="tooltip-help">
+                        <img
+                          src={helpng}
+                          alt="help"
+                          style={{
+                            width: "40px",
+                            height: "40px",
+                            marginLeft: "10px",
+                            marginTop: "5px"
+                          }}
+                          onClick={() => { handleCardClick(titleHeading) }}
+                          onMouseEnter={() => setShowTooltip(true)}
+                          onMouseLeave={() => setShowTooltip(false)}
+                        />
+                      </Tooltip>
+                    )}
+                </div>
+              </div>
+            )}
+          </Box>
+          {/* For Mobile */}
+          {!isMobile && (
+            <>
+              <Box> {RightComponent && <RightComponent />} </Box>
+              <Box> {mobileRightComponent} </Box>
+            </>
+          )}
+        </CardContent>
+      </Card>
+        <HelpModal /> </>)}
     </>
   );
 }

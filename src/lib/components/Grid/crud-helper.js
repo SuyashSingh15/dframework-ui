@@ -6,9 +6,8 @@ const dateDataTypes = ['date', 'dateTime'];
 
 const exportRecordSize = 10000;
 
-const getList = async ({ gridColumns, setIsLoading, setData, page, pageSize, sortModel, filterModel, api, parentFilters, action = 'list', setError, extraParams, contentType, columns, controllerType = 'node', template = null, configFileName = null, dispatchData, showFullScreenLoader = false, oderStatusId = 0, modelConfig = null, baseFilters = null, isElasticExport }) => {
+const getList = async ({ gridColumns, setIsLoading, setData, page, pageSize, sortModel, filterModel, api, parentFilters, action = 'list', setError, extraParams, contentType, columns, controllerType = 'node', template = null, configFileName = null, dispatchData, showFullScreenLoader = false, oderStatusId = 0, modelConfig = null, baseFilters = null, isElasticExport, model }) => {
     if (!contentType) {
-        setIsLoading(true);
         if (showFullScreenLoader) {
             dispatchData({ type: actionsStateProvider.UPDATE_LOADER_STATE, payload: true });
         }
@@ -31,13 +30,13 @@ const getList = async ({ gridColumns, setIsLoading, setData, page, pageSize, sor
     const where = [];
     if (filterModel?.items?.length) {
         filterModel.items.forEach(filter => {
-            if (["isEmpty", "isNotEmpty"].includes(filter.operator) || filter.value) {
+            if (["isEmpty", "isNotEmpty"].includes(filter.operator) || filter.value || (filter.value === false && filter.type === 'boolean')) {
                 const { field, operator, filterField } = filter;
                 let { value } = filter;
-                const column = gridColumns.filter((item) => item.field === filter.field);
+                const column = gridColumns.filter((item) => item?.field === filter?.field);
                 const type = column[0]?.type;
                 if (type === 'boolean') {
-                    value = value === 'true' ? 1 : 0;
+                    value = (value === 'true' || value === true) ? 1 : 0;
                 } else if (type === 'number') {
                     value = Array.isArray(value) ? value.filter(e => e) : value;
                 }
@@ -67,7 +66,9 @@ const getList = async ({ gridColumns, setIsLoading, setData, page, pageSize, sor
         where,
         oderStatusId: oderStatusId,
         isElasticExport,
-        fileName: modelConfig?.overrideFileName
+        model: model.module,
+        fileName: modelConfig?.overrideFileName,
+        userTimezoneOffset: new Date().getTimezoneOffset() * -1
     };
 
     if (lookups) {
@@ -157,19 +158,32 @@ const getList = async ({ gridColumns, setIsLoading, setData, page, pageSize, sor
                             }
                         }
                     });
+                    (modelConfig.columns || []).forEach(column => {
+                        const {
+                            field,
+                            displayIndex
+                        } = column;
+                        if (displayIndex) {
+                            record[field] = record[displayIndex];
+                        }
+                    });
                 });
             }
             setData(response.data);
-        } else if (response.status === HTTP_STATUS_CODES.UNAUTHORIZED) {
+        } else {
+            setError(response.statusText);
+        }
+    } catch (error) {
+        if (error.response && error.response.status === HTTP_STATUS_CODES.UNAUTHORIZED) {
             setError('Session Expired!');
             setTimeout(() => {
                 window.location.href = '/';
             }, 2000);
+        } else if (error.response && error.response.status === HTTP_STATUS_CODES.FORBIDDEN) {
+            window.location.href = '/';
         } else {
-            setError(response.statusText);
+            setError('Could not list record', error.message || error.toString());
         }
-    } catch (err) {
-        setError(err);
     } finally {
         if (!contentType) {
             setIsLoading(false);
@@ -181,7 +195,7 @@ const getList = async ({ gridColumns, setIsLoading, setData, page, pageSize, sor
 };
 
 const getRecord = async ({ api, id, setIsLoading, setActiveRecord, modelConfig, parentFilters, where = {}, setError }) => {
-    api = api || modelConfig?.api
+    api = api || modelConfig?.api;
     setIsLoading(true);
     const searchParams = new URLSearchParams();
     const url = `${api}/${id === undefined || id === null ? '-' : id}`;
@@ -199,6 +213,7 @@ const getRecord = async ({ api, id, setIsLoading, setActiveRecord, modelConfig, 
     try {
         const response = await transport({
             url: `${url}?${searchParams.toString()}`,
+            model: modelConfig.module,
             method: 'GET',
             credentials: 'include'
         });
@@ -218,16 +233,21 @@ const getRecord = async ({ api, id, setIsLoading, setActiveRecord, modelConfig, 
             const defaultValues = { ...modelConfig.defaultValues };
 
             setActiveRecord({ id, title: title, record: { ...defaultValues, ...record, ...parentFilters }, lookups });
-        } else if (response.status === HTTP_STATUS_CODES.UNAUTHORIZED) {
+        }
+        else {
+            setError('Could not load record', response.body.toString());
+        }
+    } catch (error) {
+        // Handle 401 specifically in the error block
+        if (error.response && error.response.status === HTTP_STATUS_CODES.UNAUTHORIZED) {
             setError('Session Expired!');
             setTimeout(() => {
                 window.location.href = '/';
             }, 2000);
-        } else {
-            setError('Could not load record', response.body.toString());
         }
-    } catch (error) {
-        setError('Could not load record', error);
+        else {
+            setError('Could not load record', error.message || error.toString());
+        }
     } finally {
         setIsLoading(false);
     }
@@ -247,21 +267,26 @@ const deleteRecord = async function ({ id, api, setIsLoading, setError, setError
             credentials: 'include'
         });
         if (response.status === HTTP_STATUS_CODES.OK) {
+            if (response.data && !response.data.success) {
+                result.success = false;
+                setError('Delete failed', response.data.message);
+                return false;
+            }
             result.success = true;
             return true;
+        } else {
+            setError('Delete failed', response.body);
         }
-        if (response.status === HTTP_STATUS_CODES.UNAUTHORIZED) {
+    } catch (error) {
+        if (error.response && error.response.status === HTTP_STATUS_CODES.UNAUTHORIZED) {
             setError('Session Expired!');
             setTimeout(() => {
                 window.location.href = '/';
             }, 2000);
         } else {
-            setError('Delete failed', response.body);
+            setError('Could not delete record', error.message || error.toString());
         }
-    } catch (error) {
-        const errorMessage = error?.response?.data?.error;
-        result.error = errorMessage;
-        setErrorMessage(errorMessage);
+
     } finally {
         setIsLoading(false);
     }
@@ -298,17 +323,18 @@ const saveRecord = async function ({ id, api, values, setIsLoading, setError }) 
             }
             setError('Save failed', data.err || data.message);
             return;
+        } else {
+            setError('Save failed', response.body);
         }
-        if (response.status === HTTP_STATUS_CODES.UNAUTHORIZED) {
+    } catch (error) {
+        if (error.response && error.response.status === HTTP_STATUS_CODES.UNAUTHORIZED) {
             setError('Session Expired!');
             setTimeout(() => {
                 window.location.href = '/';
             }, 2000);
         } else {
-            setError('Save failed', response.body);
+            setError('Could not save record', error.message || error.toString());
         }
-    } catch (error) {
-        setError('Save failed', error);
     } finally {
         setIsLoading(false);
     }

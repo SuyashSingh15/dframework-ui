@@ -7,6 +7,8 @@ Object.defineProperty(exports, "__esModule", {
 exports.useStateContext = exports.useRouter = exports.StateProvider = exports.RouterProvider = void 0;
 require("core-js/modules/es.error.cause.js");
 require("core-js/modules/es.promise.js");
+require("core-js/modules/esnext.iterator.constructor.js");
+require("core-js/modules/esnext.iterator.filter.js");
 require("core-js/modules/web.dom-collections.iterator.js");
 var _react = _interopRequireWildcard(require("react"));
 var _stateReducer = _interopRequireDefault(require("./stateReducer"));
@@ -15,9 +17,14 @@ var _httpRequest = _interopRequireDefault(require("../Grid/httpRequest"));
 var _localization = require("../mui/locale/localization");
 var _dayjs = _interopRequireDefault(require("dayjs"));
 var _actions = _interopRequireDefault(require("./actions"));
+var _utc = _interopRequireDefault(require("dayjs/plugin/utc"));
+var _timezone = _interopRequireDefault(require("dayjs/plugin/timezone"));
 function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
 function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function _getRequireWildcardCache(e) { return e ? t : r; })(e); }
 function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != typeof e && "function" != typeof e) return { default: e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && {}.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n.default = e, t && t.set(e, n), n; }
+// Extend dayjs with the plugins
+_dayjs.default.extend(_utc.default);
+_dayjs.default.extend(_timezone.default);
 const StateContext = /*#__PURE__*/(0, _react.createContext)();
 const RouterContext = /*#__PURE__*/(0, _react.createContext)(null);
 const StateProvider = _ref => {
@@ -55,19 +62,13 @@ const StateProvider = _ref => {
       history,
       dispatchData,
       preferenceApi,
-      tablePreferenceEnums
+      tablePreferenceEnums = {},
+      addDefaultPreference = false
     } = _ref2;
     const params = {
       action: 'list',
       id: preferenceName,
       Username
-    };
-    const defaultCoolrPref = {
-      "prefName": "CoolR Default",
-      "prefId": 0,
-      "GridId": preferenceName,
-      "GridPreferenceId": 0,
-      "prefValue": tablePreferenceEnums[preferenceName]
     };
     const response = await (0, _httpRequest.default)({
       url: preferenceApi,
@@ -75,17 +76,43 @@ const StateProvider = _ref => {
       history,
       dispatchData
     });
-    let preferences = response !== null && response !== void 0 && response.preferences ? [defaultCoolrPref, ...(response === null || response === void 0 ? void 0 : response.preferences)] : defaultCoolrPref;
+    let preferences = (response === null || response === void 0 ? void 0 : response.preferences) || [];
+    if (addDefaultPreference) {
+      const defaultPref = {
+        "prefName": "Default",
+        "prefId": 0,
+        "GridId": preferenceName,
+        "GridPreferenceId": 0,
+        "prefValue": tablePreferenceEnums[preferenceName]
+      };
+      preferences = [defaultPref, ...preferences];
+    }
     dispatchData({
       type: _actions.default.UDPATE_PREFERENCES,
       payload: preferences
     });
     dispatchData({
       type: _actions.default.TOTAL_PREFERENCES,
-      payload: response === null || response === void 0 ? void 0 : response.preferences.length
+      payload: preferences.length
     });
   }
-  async function applyDefaultPreferenceIfExists(_ref3) {
+
+  /**
+  * Filters out data elements whose fields do not exist in the grid's columns.
+  *
+  * @param {Object} params - The parameters object.
+  * @param {Object} params.gridRef - A reference to the grid component.
+  * @param {Array} params.data - The data array to filter.
+  * @returns {Array} The filtered array containing only elements with existing columns in the grid.
+  */
+  const filterNonExistingColumns = _ref3 => {
+    let {
+      gridRef,
+      data
+    } = _ref3;
+    return data.filter(ele => gridRef.current.getColumnIndex(ele.field) !== -1);
+  };
+  async function applyDefaultPreferenceIfExists(_ref4) {
     let {
       gridRef,
       history,
@@ -94,8 +121,8 @@ const StateProvider = _ref => {
       preferenceName,
       setIsGridPreferenceFetched,
       preferenceApi,
-      tablePreferenceEnums
-    } = _ref3;
+      tablePreferenceEnums = {}
+    } = _ref4;
     const params = {
       action: 'default',
       id: preferenceName,
@@ -108,11 +135,18 @@ const StateProvider = _ref => {
       dispatchData
     });
     let userPreferenceCharts = response !== null && response !== void 0 && response.prefValue ? JSON.parse(response.prefValue) : tablePreferenceEnums[preferenceName];
-    if (userPreferenceCharts) {
-      userPreferenceCharts === null || userPreferenceCharts === void 0 || userPreferenceCharts.gridColumn.forEach(ele => {
-        if (gridRef.current.getColumnIndex(ele.field) !== -1) {
-          gridRef.current.setColumnWidth(ele.field, ele.width);
-        }
+    if (userPreferenceCharts && Object.keys(userPreferenceCharts).length) {
+      userPreferenceCharts.gridColumn = filterNonExistingColumns({
+        gridRef,
+        data: userPreferenceCharts.gridColumn
+      });
+      userPreferenceCharts.sortModel = filterNonExistingColumns({
+        gridRef,
+        data: userPreferenceCharts.sortModel
+      });
+      userPreferenceCharts.filterModel.items = filterNonExistingColumns({
+        gridRef,
+        data: userPreferenceCharts.filterModel.items
       });
       gridRef.current.setColumnVisibilityModel(userPreferenceCharts.columnVisibilityModel);
       gridRef.current.setPinnedColumns(userPreferenceCharts.pinnedColumns);
@@ -120,28 +154,36 @@ const StateProvider = _ref => {
       gridRef.current.setFilterModel(userPreferenceCharts === null || userPreferenceCharts === void 0 ? void 0 : userPreferenceCharts.filterModel);
       dispatchData({
         type: _actions.default.SET_CURRENT_PREFERENCE_NAME,
-        payload: response !== null && response !== void 0 && response.prefValue ? response.prefName : 'CoolR Default'
+        payload: response !== null && response !== void 0 && response.prefValue ? response.prefName : 'Default'
       });
     }
     if (setIsGridPreferenceFetched) {
       setIsGridPreferenceFetched(true);
     }
   }
-  function removeCurrentPreferenceName(_ref4) {
+  function removeCurrentPreferenceName(_ref5) {
     let {
       dispatchData
-    } = _ref4;
+    } = _ref5;
     dispatchData({
       type: _actions.default.SET_CURRENT_PREFERENCE_NAME,
       payload: null
     });
   }
-  function formatDate(value, useSystemFormat) {
-    let showOnlyDate = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-    let state = arguments.length > 3 ? arguments[3] : undefined;
+  function formatDate(_ref6) {
+    let {
+      value,
+      useSystemFormat,
+      showOnlyDate = false,
+      state,
+      timeZone
+    } = _ref6;
     if (value) {
       const format = systemDateTimeFormat(useSystemFormat, showOnlyDate, state); // Pass 'state' as an argument
-      return (0, _dayjs.default)(value).format(format);
+      if (!timeZone) {
+        return (0, _dayjs.default)(value).format(format);
+      }
+      return (0, _dayjs.default)(value).tz(timeZone).format(format);
     }
     return '-';
   }

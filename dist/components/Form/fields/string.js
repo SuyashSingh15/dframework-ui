@@ -22,12 +22,21 @@ const field = _ref => {
   } = _ref;
   return /*#__PURE__*/_react.default.createElement(_TextField.default, _extends({
     type: "text",
-    variant: "standard",
+    variant: column.variant || "standard",
     InputProps: {
-      readOnly: (column === null || column === void 0 ? void 0 : column.readOnly) === true
+      readOnly: (column === null || column === void 0 ? void 0 : column.readOnly) === true,
+      sx: column !== null && column !== void 0 && column.readOnly ? {
+        backgroundColor: '#dfdede'
+      } // Light grey background for read-only inputs
+      : undefined
+    },
+    inputProps: {
+      maxLength: column.max // Apply maxLength directly here
     },
     key: field,
     required: column === null || column === void 0 ? void 0 : column.required,
+    multiline: column.multiline,
+    rows: column.rows,
     fullWidth: true,
     name: field,
     value: formik.values[field],

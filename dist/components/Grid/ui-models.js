@@ -4,6 +4,8 @@ require("core-js/modules/es.array.includes.js");
 require("core-js/modules/es.array.push.js");
 require("core-js/modules/es.string.includes.js");
 require("core-js/modules/es.weak-map.js");
+require("core-js/modules/esnext.iterator.filter.js");
+require("core-js/modules/esnext.iterator.for-each.js");
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -11,19 +13,23 @@ exports.UiModel = void 0;
 require("core-js/modules/es.error.cause.js");
 require("core-js/modules/es.object.assign.js");
 require("core-js/modules/es.regexp.exec.js");
+require("core-js/modules/es.regexp.test.js");
 require("core-js/modules/es.string.match.js");
 require("core-js/modules/es.string.replace.js");
 require("core-js/modules/es.string.replace-all.js");
 require("core-js/modules/es.string.trim.js");
+require("core-js/modules/esnext.iterator.constructor.js");
+require("core-js/modules/esnext.iterator.find.js");
 require("core-js/modules/web.dom-collections.iterator.js");
 var _index = _interopRequireDefault(require("./index"));
 var _react = _interopRequireDefault(require("react"));
 var yup = _interopRequireWildcard(require("yup"));
-var _Paper = _interopRequireDefault(require("@mui/material/Paper"));
 var _material = require("@mui/material");
 var _Form = _interopRequireDefault(require("../Form/Form"));
+var _ReadonlyPanel = _interopRequireDefault(require("../ReadonlyPanel"));
 const _excluded = ["match"],
-  _excluded2 = ["match"];
+  _excluded2 = ["match"],
+  _excluded3 = ["match"];
 function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function _getRequireWildcardCache(e) { return e ? t : r; })(e); }
 function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != typeof e && "function" != typeof e) return { default: e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && {}.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n.default = e, t && t.set(e, n), n; }
 function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
@@ -44,6 +50,7 @@ const defaultValueConfigs = {
   "radio": false,
   "oneToMany": ""
 };
+const compareValidatorRegex = /^compare:(.+)$/;
 class UiModel {
   constructor(modelConfig) {
     _defineProperty(this, "Form", _ref => {
@@ -61,10 +68,19 @@ class UiModel {
           match
         } = _ref2,
         props = _objectWithoutProperties(_ref2, _excluded2);
-      return /*#__PURE__*/_react.default.createElement(_Paper.default, null, /*#__PURE__*/_react.default.createElement(_index.default, _extends({
+      return /*#__PURE__*/_react.default.createElement(_index.default, _extends({
         model: this,
         showRowsSelected: showRowsSelected
-      }, props)));
+      }, props));
+    });
+    _defineProperty(this, "Readonly", _ref3 => {
+      let {
+          match
+        } = _ref3,
+        props = _objectWithoutProperties(_ref3, _excluded3);
+      return /*#__PURE__*/_react.default.createElement(_ReadonlyPanel.default, _extends({
+        model: this
+      }, props));
     });
     _defineProperty(this, "ChildGrid", props => {
       return /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, /*#__PURE__*/_react.default.createElement(_index.default, _extends({
@@ -80,22 +96,34 @@ class UiModel {
       }));
     });
     const {
-      title,
+      title = "",
       controllerType
     } = modelConfig;
     let {
       api,
       idProperty = api + 'Id'
     } = modelConfig;
+    // if module is not specified, use title as module name after removing all alphanumeric characters
+    const module = "module" in modelConfig ? modelConfig.module : title.replace(/[^\w\s]/gi, "");
     if (!api) {
       api = "".concat(title.replaceAll(nonAlphaNumeric, '-').toLowerCase());
       idProperty = title.replaceAll(' ', '') + 'Id';
     }
     api = controllerType === 'cs' ? "".concat(api, ".ashx") : "".concat(api);
     const defaultValues = _objectSpread({}, modelConfig.defaultValues);
+    const name = module || title;
     Object.assign(this, _objectSpread(_objectSpread({
       standard: true,
-      idProperty
+      name,
+      // for child grid wuth no specific module but wants name to be identified in models list in relations.
+      permissions: _objectSpread({}, UiModel.defaultPermissions),
+      idProperty,
+      defaultSort: "ModifiedOn DESC",
+      linkColumn: "".concat(name, "Name"),
+      overrideFileName: title,
+      preferenceId: name,
+      tableName: name,
+      module
     }, modelConfig), {}, {
       api
     }));
@@ -110,10 +138,10 @@ class UiModel {
     this.columnVisibilityModel = columnVisibilityModel;
     this.defaultValues = defaultValues;
   }
-  getValidationSchema(_ref3) {
+  getValidationSchema(_ref4) {
     let {
       id
-    } = _ref3;
+    } = _ref4;
     const {
       columns
     } = this;
@@ -129,16 +157,16 @@ class UiModel {
         min = '',
         max = '',
         validationLength = 0,
-        fieldLabel
+        validate
       } = column;
       const formLabel = label || header || field;
-      if (!formLabel || !fieldLabel) {
+      if (!formLabel) {
         continue;
       }
       let config;
       switch (type) {
         case 'string':
-          config = yup.string().trim().label(formLabel);
+          config = yup.string().nullable().trim().label(formLabel);
           if (min) {
             config = config.min(Number(min), "".concat(formLabel, " must be at least ").concat(min, " characters long"));
           }
@@ -162,18 +190,66 @@ class UiModel {
             return value;
           }).label(formLabel).required("".concat(formLabel, " is required"));
           break;
+        case 'dateTime':
+          config = yup.date().nullable() // Allow null values
+          .transform((value, originalValue) => {
+            // Transform empty strings or null values into null
+            if (originalValue === '' || originalValue === null) return null;
+            return value;
+          }).label(formLabel); // Set a label for better error messages
+          break;
+        case 'select':
         case 'autocomplete':
-          config = yup.string().trim().label(formLabel).required("Select at least one ".concat(formLabel));
+          if (required) {
+            config = yup.string().trim().label(formLabel).required("Select at least one ".concat(formLabel));
+          } else {
+            config = yup.string();
+          }
+          break;
+        case 'password':
+          config = yup.string().label(formLabel).test("ignore-asterisks", "".concat(formLabel, " must be at least 8 characters and must contain at least one lowercase letter, one uppercase letter, one digit, and one special character"), value => {
+            // Skip further validations if value is exactly "******"
+            if (value === "******") return true;
+            // Check minimum length, maximum length, and pattern if not "******"
+            return yup.string().min(8, "".concat(formLabel, " must be at least 8 characters")).max(50, "".concat(formLabel, " must be at most 50 characters")).matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,50}$/, "".concat(formLabel, " must contain at least one lowercase letter, one uppercase letter, one digit, and one special character")).isValidSync(value);
+          });
+          break;
+        case 'email':
+          config = yup.string().trim().matches(/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/, 'Email must be a valid email');
+          break;
+        case 'number':
+          if (required) {
+            config = yup.number().label(formLabel).required("".concat(formLabel, " is required."));
+          } else {
+            config = yup.number();
+          }
+          if (min) {
+            config = config.min(Number(min), "".concat(formLabel, " must be greater than or equal to ").concat(min));
+          }
+          if (max) {
+            config = config.max(Number(max), "".concat(formLabel, " must be less than or equal to ").concat(max));
+          }
+          break;
+        case 'document':
+          config = yup.string().trim().label(formLabel);
           break;
         default:
           config = yup.mixed().label(formLabel);
           break;
       }
-      if (required) {
+      if (required && type !== "number") {
         config = config.trim().required("".concat(formLabel, " is required"));
       }
       if (requiredIfNew && (!id || id === '')) {
         config = config.trim().required("".concat(formLabel, " is required"));
+      }
+      if (validate) {
+        const compareValidator = compareValidatorRegex.exec(validate);
+        if (compareValidator) {
+          const compareFieldName = compareValidator[1];
+          const compareField = columns.find(f => (f.formField === compareFieldName || f.field) === compareFieldName);
+          config = config.oneOf([yup.ref(compareFieldName)], "".concat(formLabel, " must match ").concat(compareField.label));
+        }
       }
       validationConfig[field] = config;
     }
@@ -182,3 +258,8 @@ class UiModel {
   }
 }
 exports.UiModel = UiModel;
+_defineProperty(UiModel, "defaultPermissions", {
+  add: true,
+  edit: true,
+  delete: true
+});
